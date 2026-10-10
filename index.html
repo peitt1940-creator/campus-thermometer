@@ -7,14 +7,14 @@
 <title>校園溫度計</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* Layout: start page = title + a real 0–100° campus thermometer + self-check question; play = full-screen top-down campus canvas under a slim HUD, events arrive as taped paper notes with a countdown; end = report keyed to final temperature */
 :root{
-  --bg:#e3e7e4; --sheet:#fbfaf6; --ink:#24292c; --muted:#5d6965; --line:#cbd3cf;
+  --bg:#e9eef1; --sheet:#fbfaf6; --ink:#24292c; --muted:#5d6965; --line:#cbd3cf;
   --brick:#c8553d; --frost:#3f78a3; --leaf:#3c8457; --sun:#e2a131; --note:#fffbea; --plum:#8a5aa8; --sage:#5a8f7b;
-  --f-display:"Huninn","LXGW WenKai TC","Kaiti TC","DFKai-SB",sans-serif;
-  --f-hand:"LXGW WenKai TC","Kaiti TC","BiauKai","DFKai-SB",serif;
+  --f-display:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-hand:"Huninn","PingFang TC","Microsoft JhengHei",sans-serif;
   --f-ui:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   color-scheme:light;
 }
@@ -36,13 +36,13 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .lede{color:var(--muted);margin-top:8px;max-width:30em}
 .bigthermo{display:grid;grid-template-columns:auto auto;gap:0 8px;align-items:stretch;padding-top:8px}
 .tube{position:relative;width:26px;height:230px;border:3px solid var(--ink);border-radius:13px 13px 0 0;border-bottom:none;background:var(--sheet);overflow:hidden}
-.tube i{position:absolute;left:4px;right:4px;bottom:0;height:40%;border-radius:6px 6px 0 0;background:var(--brick);animation:rise 2.4s ease-in-out .3s both}
-@keyframes rise{0%{height:8%}55%{height:80%}100%{height:40%}}
+.tube i{position:absolute;left:4px;right:4px;bottom:0;height:var(--h,40%);border-radius:6px 6px 0 0;background:var(--brick);animation:rise 2.4s ease-in-out .3s both}
+@keyframes rise{0%{height:8%}55%{height:80%}100%{height:var(--h,40%)}}
 .bulb{grid-column:1;width:46px;height:46px;margin-left:-10px;margin-top:-4px;border:3px solid var(--ink);border-radius:50%;background:var(--brick)}
 .ticks{grid-column:2;grid-row:1/3;display:flex;flex-direction:column;justify-content:space-between;height:230px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
 .ticks span b{color:var(--ink);font-weight:500;margin-right:4px}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:22px}
-.how div{padding:10px 12px;background:var(--sheet);border:1.5px solid var(--ink);border-radius:6px;font-size:14px}
+.how div{padding:11px 13px;background:#fff;border:1.5px solid #cdd6dc;border-radius:12px;font-size:14px}
 .how b{display:block;font-family:var(--f-display);font-size:16px;font-weight:400}
 .cast{margin-top:22px}
 .cast h3,.end h3,.selfq h3{font-size:12px;letter-spacing:.18em;color:var(--muted);font-weight:500}
@@ -64,8 +64,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .teacher select{padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--sheet)}
 
 /* ---------- 遊戲畫面 ---------- */
-#game{position:fixed;inset:0;display:flex;flex-direction:column;background:#2d3833;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-.hud{background:#1f2724;color:#eef1ee;padding:8px 12px 8px;display:grid;gap:6px;flex:none;border-bottom:2px solid #11171a}
+#game{position:fixed;inset:0;display:flex;flex-direction:column;background:#b7c3c9;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.hud{background:#fbfaf6;color:#1f2a44;padding:8px 12px 8px;display:grid;gap:6px;flex:none;border-bottom:1px solid #cdd6dc;box-shadow:0 4px 14px -8px rgba(31,42,68,.35);position:relative;z-index:2}
 .hud-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .timebox{min-width:0}
 .ph{font-size:11.5px;opacity:.75;white-space:nowrap}
@@ -76,26 +76,26 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .th-num{font-family:var(--f-display);font-size:22px;line-height:1;font-variant-numeric:tabular-nums;min-width:2.6em;text-align:right}
 .th-lab{font-size:10.5px;opacity:.7;white-space:nowrap}
 .hud-btns{display:flex;gap:5px}
-.hud-btns button{background:transparent;border:1px solid rgba(255,255,255,.3);color:#eef1ee;border-radius:4px;padding:2px 8px;font-size:12px}
+.hud-btns button{background:transparent;border:1px solid rgba(31,42,68,.28);color:#1f2a44;border-radius:4px;padding:2px 8px;font-size:12px}
 .hud-btns button[aria-pressed="false"]{opacity:.5;text-decoration:line-through}
 .flow{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;font-size:11px;white-space:nowrap}
 .flow::-webkit-scrollbar{display:none}
-.flow span{padding:0 8px;border-radius:999px;border:1px solid rgba(255,255,255,.2);opacity:.6}
+.flow span{padding:0 8px;border-radius:999px;border:1px solid rgba(31,42,68,.22);opacity:.75}
 .flow span.done{opacity:.35;text-decoration:line-through}
-.flow span.now{opacity:1;background:#f0c27a;color:#24292c;border-color:#f0c27a;font-weight:700}
-.goal{font-size:12.5px;color:#f0c27a;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
-.goal .tk{font-size:11.5px;color:#eef1ee;padding:0 7px;border-radius:3px;border:1px solid rgba(255,255,255,.3)}
-.goal .tk.ok{background:#3c8457;border-color:#3c8457;text-decoration:line-through}
-.goal .tk.no{background:#5b6670;border-color:#5b6670;text-decoration:line-through;opacity:.7}
+.flow span.now{opacity:1;background:var(--brick);color:#fff;border-color:var(--brick);font-weight:700}
+.goal{font-size:12.5px;color:var(--brick);font-weight:500;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.goal .tk{font-size:11.5px;color:#1f2a44;font-weight:400;padding:0 7px;border-radius:999px;border:1px solid rgba(31,42,68,.28)}
+.goal .tk.ok{background:var(--leaf);border-color:var(--leaf);color:#fff;text-decoration:line-through}
+.goal .tk.no{background:#8d979e;border-color:#8d979e;color:#fff;text-decoration:line-through;opacity:.8}
 @media (max-width:460px){.thermo{flex:0 1 auto;min-width:0}.th-track{display:none}.th-lab{font-size:10.5px;white-space:normal;max-width:7em;line-height:1.25}}
 #stage{position:relative;flex:1;min-height:0;overflow:hidden}
 #cv{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none}
-#toast{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);max-width:calc(100% - 32px);background:rgba(18,24,22,.88);color:#f3f1e6;padding:7px 14px;border-radius:6px;font-size:14px;text-align:center;pointer-events:none;opacity:0;transition:opacity .3s}
+#toast{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);max-width:calc(100% - 32px);background:rgba(31,42,68,.92);color:#fbfaf6;padding:7px 16px;border-radius:999px;font-size:14px;text-align:center;pointer-events:none;opacity:0;transition:opacity .3s}
 #toast.on{opacity:1}
-#banner{position:absolute;left:50%;top:36%;transform:translate(-50%,-50%) scale(.96);text-align:center;color:#fff;background:rgba(18,24,22,.86);padding:14px 26px;border-radius:10px;pointer-events:none;opacity:0;transition:opacity .35s,transform .35s;max-width:calc(100% - 32px)}
-#banner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
-#banner b{display:block;font-family:var(--f-display);font-weight:400;font-size:30px;color:#f0c27a}
-#banner span{display:block;font-size:15px;margin-top:2px}
+#banner{position:absolute;left:50%;top:12px;transform:translate(-50%,-12px);text-align:center;color:#1f2a44;background:#fbfaf6;padding:6px 18px;border-radius:18px;box-shadow:0 6px 18px -8px rgba(31,42,68,.5);pointer-events:none;opacity:0;transition:opacity .35s,transform .35s;max-width:calc(100% - 32px);width:max-content;line-height:1.4}
+#banner.on{opacity:1;transform:translate(-50%,0)}
+#banner b{display:inline;font-family:var(--f-display);font-weight:400;font-size:19px;color:var(--brick)}
+#banner span{display:inline;font-size:14px;margin-left:10px}
 .ctlhint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;color:#fff;background:rgba(0,0,0,.45);padding:4px 12px;border-radius:999px;pointer-events:none;white-space:nowrap;transition:opacity .6s}
 #pauseMsg{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,14,12,.55);color:#fff;font-family:var(--f-display);font-size:30px;letter-spacing:.3em}
 #shade{position:absolute;inset:0;background:rgba(10,14,12,.42)}
@@ -114,14 +114,14 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .note h2{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.3;margin-top:10px}
 .narr{font-family:var(--f-hand);font-size:18px;line-height:1.75;margin:6px 0 0;max-width:34em}
 .opts{display:grid;gap:9px;margin-top:14px}
-.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;background:var(--sheet);border:1.5px solid var(--ink);border-radius:6px;box-shadow:3px 3px 0 var(--ink);transition:transform .12s,box-shadow .12s}
-.opt:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
-.opt:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.opt{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;padding:11px 13px;background:#fff;border:1.5px solid #cdd6dc;border-radius:12px;box-shadow:0 2px 6px -3px rgba(31,42,68,.35);transition:transform .12s,box-shadow .12s,border-color .12s}
+.opt:hover{transform:translateY(-1px);border-color:var(--frost);box-shadow:0 6px 14px -6px rgba(31,42,68,.45)}
+.opt:active{transform:translateY(1px);box-shadow:0 1px 3px -2px rgba(31,42,68,.4)}
 .opt .k{flex:none;width:25px;height:25px;border-radius:50%;border:1.5px solid var(--frost);color:var(--frost);font-weight:700;font-size:13px;display:grid;place-items:center}
 .opt .t{min-width:0;font-size:15.5px;line-height:1.5;padding-top:1px}
 .opt .t small{display:block;font-size:12.5px;color:var(--muted)}
 .opt[disabled]{opacity:.35;box-shadow:none;cursor:default;transform:none}
-.opt.picked{opacity:1;border-color:var(--frost);box-shadow:3px 3px 0 var(--frost)}
+.opt.picked{opacity:1;border-color:var(--frost);background:#eef4f9}
 .res{margin-top:14px;padding-top:12px;border-top:2px dashed var(--line);display:grid;gap:10px}
 .res .narr{margin:0}
 .why{font-size:13px;color:var(--muted)}
@@ -129,7 +129,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .delta{font-family:var(--f-display);font-size:16px;padding:2px 12px;border-radius:999px;color:#fff;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
 .delta.up{background:var(--brick)} .delta.down{background:var(--frost)} .delta.flat{background:var(--muted)} .delta.time{background:#5b6670}
 @keyframes pop{from{transform:scale(1.8);opacity:0}to{transform:scale(1);opacity:1}}
-.next{padding:12px;border:none;border-radius:6px;background:var(--ink);color:var(--sheet);font-weight:700;letter-spacing:.1em}
+.next{padding:12px;border:none;border-radius:999px;background:#1f2a44;color:var(--sheet);font-weight:700;letter-spacing:.1em}
 .tasks{display:grid;gap:4px;margin-top:10px;font-size:14px}
 .tasks span{display:flex;gap:8px;align-items:baseline}
 .tasks b{flex:none;width:1.4em;text-align:center}
@@ -146,7 +146,7 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .tierline{font-family:var(--f-hand);font-size:19px;line-height:1.8;margin-top:10px;max-width:32em}
 .sect{margin-top:28px;border-top:1px solid rgba(36,41,44,.18);padding-top:14px}
 .vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
-.vs div{background:var(--sheet);border:1.5px solid var(--ink);border-radius:6px;padding:10px 12px}
+.vs div{background:#fff;border:1.5px solid #cdd6dc;border-radius:12px;padding:10px 12px}
 .vs small{display:block;font-size:12px;color:var(--muted)}
 .vs b{font-family:var(--f-display);font-weight:400;font-size:19px;line-height:1.4}
 .vsnote{font-size:14px;margin:10px 0 0}
@@ -205,45 +205,152 @@ h1,h2,h3{margin:0;text-wrap:balance}
 <div id="end" class="end" hidden></div>
 
 <script>
-/* 校園溫度計 v2 */
-/* ================= 人物 ================= */
-const PPL={
+/* =====================================================================
+   遊戲範本：設定區
+   ---------------------------------------------------------------------
+   做新遊戲時，只要改這個 <script> 區塊；下方的「引擎」區塊不用動。
+   改動順序建議：
+     1. INFO    遊戲名稱、開場文字、出處
+     2. PEOPLE  登場人物
+     3. MAP     地圖（教室、空地、樹、校門）
+     4. TASKS   主角「自己的事」
+     5. PHASES  一天的時段，以及每個時段會出現哪些事件卡
+     6. CARDS   事件卡（每張兩種線索版本）
+     7. NEEDS   「換你需要幫忙」
+     8. 結算頁：等級、討論題、補充說明
+   ===================================================================== */
+
+/* 事件卡寫法小工具（不用改）
+   C(編號, 人物, 標題, 敘述含{v}, 選項陣列, {A:線索A, B:線索B})
+   一般選項：['選項文字', 類型, '結果', {額外設定}]
+   依線索不同：V('選項文字', [A類型, 'A結果', {A額外}], [B類型, 'B結果', {B額外}], {共同設定})
+   類型：w 真心 / m 沒看清楚 / o 剛好 / p 做表面 / c 路過 / h 傷人
+   額外設定：cost 花幾分鐘（只在下課計算）、d 改溫度、tr 改信任、f 設旗標、trMin 信任至少、by 旁觀者 */
+function C(id,who,ti,tx,ops,vars){return {id,who,ti,tx,vars,ops:ops.map(o=>Object.assign({l:o[0],t:o[1],r:o[2]},o[3]||{}))}}
+function V(l,a,b,ex){return [l,'',' ',Object.assign({v:{A:Object.assign({t:a[0],r:a[1]},a[2]||{}),B:Object.assign({t:b[0],r:b[1]},b[2]||{})}},ex||{})]}
+
+const GAME={
+/* ---------- 1. 基本資訊 ---------- */
+id:'campus-thermo',                 // 存設定用的代號（英文），不同遊戲請取不同代號
+title:'校園溫度計',
+titleParts:['校園','溫度','計'],     // 標題分三段，中間那段會變紅色
+eyebrow:'一天・八個時段・沒有標準答案',
+ask:'今天，校園會是幾度？',
+lede:'你是五年三班的學生，今天有 5 件自己的事要做完。一路上，你會遇到同學、老師、學長姊和學弟妹。早上的校園是 40°，你怎麼對待他們，溫度就會悄悄改變，放學時才會揭曉。',
+how:[['走路','手指在畫面上拖曳，或用鍵盤方向鍵。'],
+     ['自己的事','5 件事分散在兩次下課，每次只有 10 分鐘。停下來幫人，自己的事可能就做不完。'],
+     ['紙條有倒數','{cd} 秒內沒做決定，就當作你走過去了。']],
+credit:'遊戲背景改編自辛巴王《今天也要平安下班》',
+startTemp:40,
+openingLine:'今天早上的校園是 40°',
+endEyebrow:'16:20 放學',
+countdown:15,                       // 紙條預設倒數秒數，0 = 不倒數
+breakName:'下課',
+
+/* ---------- 2. 登場人物（開始頁會列出 cast 裡的人） ---------- */
+people:{
   zhe:{n:'阿哲',r:'同班同學',c:'#e07a3b'},
   jiaen:{n:'小恩',r:'轉學生',c:'#3b8fb0'},
   yu:{n:'小魚',r:'同班同學',c:'#c99422'},
-  mi:{n:'小米',r:'一年級學妹',c:'#e0668c'},
-  dou:{n:'豆豆',r:'三年級學弟',c:'#4f9a52'},
+  mi:{n:'小米',r:'一年級學妹',c:'#e0668c',small:1},
+  dou:{n:'豆豆',r:'三年級學弟',c:'#4f9a52',small:1},
   yx:{n:'宇翔',r:'六年級學長',c:'#4a5bb0'},
   py:{n:'品妍',r:'六年級學姊',c:'#9256b0'},
-  lin:{n:'林老師',r:'導師',c:'#7a6450'},
+  lin:{n:'林老師',r:'導師',c:'#7a6450',big:1},
   kai:{n:'阿凱',r:'四年級',c:'#6d7f88'},
-  lele:{n:'樂樂',r:'二年級學弟',c:'#c2683a'}
-};
-/* 六種選擇 */
-const TYPE={
+  lele:{n:'樂樂',r:'二年級學弟',c:'#c2683a',small:1}
+},
+cast:['zhe','jiaen','yu','mi','dou','yx','py','lin'],
+
+/* ---------- 3. 地圖：36×24 格，每格約一張桌子大 ----------
+   rooms：建築物（不能走進去），dx/dy 是門的位置，out=1 門朝下、-1 門朝上
+   areas：可以走的空地，kind 是 field 跑道 / court 球場 / grass 草地 */
+map:{w:36,h:24,
+  rooms:[
+    {id:'low',n:'一年級教室',x:2,y:1,w:8,h:4,dx:6,dy:4,face:'down'},
+    {id:'cls',n:'五年三班',x:12,y:1,w:8,h:4,dx:15,dy:4,face:'down'},
+    {id:'six',n:'六年級教室',x:22,y:1,w:8,h:4,dx:26,dy:4,face:'down'},
+    {id:'off',n:'辦公室',x:1,y:8,w:4,h:4,dx:4,dy:9,face:'right'},
+    {id:'nur',n:'保健室',x:1,y:12,w:4,h:3,dx:4,dy:13,face:'right'},
+    {id:'lib',n:'圖書室',x:31,y:8,w:4,h:4,dx:31,dy:9,face:'left'},
+    {id:'shop',n:'合作社',x:31,y:12,w:4,h:3,dx:31,dy:13,face:'left'}],
+  areas:[
+    {id:'garden',n:'中庭',kind:'grass',x:8,y:8,w:20,h:5},
+    {id:'court',n:'籃球場',kind:'court',x:2,y:17,w:9,h:5},
+    {id:'fld',n:'操場',kind:'field',x:17,y:15,w:18,h:8}],
+  trees:[[8,8],[27,8],[8,12],[27,12],[13,18],[15,21],[1,16],[16,16]],
+  props:[{kind:'flag',x:17,y:10}],          // 中庭的升旗台
+  gate:{id:'gate',n:'校門口',label:'校門',x:14,y:22.2}
+},
+/* 景色配色：warm 校園溫暖時、cold 校園冷時，中間會自動漸變；rooms 是每棟建築屋頂的顏色 */
+palette:{
+  warm:{floor:'#f0e3cf',speck:['#dcc8ab','#f8efe2','#c9b08c'],grass:['#86b862','#8fc06b'],wall:'#8b5e4a',wallTop:'#a8735c',court:'#5f8fb8',line:'#f4f7fa',track:'#d06a4a',tree:['#3f7f4a','#5aa064'],flag:'#e0533d',
+    rooms:{low:'#f2b880',cls:'#e9935f',six:'#d7835a',lib:'#9fc48a',nur:'#f1cfc3',off:'#b9a3d6',shop:'#f2c75c'}},
+  cold:{floor:'#d3d9df',speck:['#bcc4cc','#e5e9ed','#a3adb7'],grass:['#94a8a6','#9cb0ae'],wall:'#58616b',wallTop:'#6b747e',court:'#7d8796',line:'#e3e8ec',track:'#8f8790',tree:['#506a66','#617d78'],flag:'#8a96a3',
+    rooms:{low:'#b3bcc6',cls:'#a9b3be',six:'#9fa9b5',lib:'#a9b8b4',nur:'#d3d9de',off:'#aaa7bd',shop:'#b7b9ab'}}
+},
+
+/* ---------- 4. 自己的事 ----------
+   at：要去的地點；only：只能在第幾個時段（從 0 算）完成，不填 = 任何下課都可以，最後一次下課結束前要做完
+   go/act：下課選單上顯示的文字；done/failTrust：完成或沒完成時，信任的變化 */
+tasks:{
+  glue:{n:'去合作社買膠水',s:'膠水',due:'第一節下課（第三節分組要用）',at:'shop',only:1,go:'去合作社',act:'買膠水',fail:'第三節分組課沒有膠水，海報只好用膠帶黏，貼歪了一角。'},
+  form:{n:'把運動會報名表交到辦公室',s:'報名表',due:'第一節下課',at:'off',only:1,go:'去辦公室',act:'交運動會報名表',fail:'報名表晚交了，大隊接力的名單裡沒有你。'},
+  book:{n:'把《小王子》還到圖書室',s:'還書',due:'今天放學前',at:'lib',go:'去圖書室',act:'還《小王子》',fail:'書逾期了，圖書室登記你這星期不能借書。'},
+  go:{n:'把借來的圍棋還給六年級的宇翔學長',s:'圍棋',due:'今天放學前',at:'six',go:'去六年級教室',act:'還圍棋給宇翔學長',done:{yx:1},failTrust:{yx:-1},fail:'圍棋沒還，宇翔學長放學時在你們班門口等了 5 分鐘。'},
+  yu:{n:'去籃球場找小魚，約放學一起去書店',s:'找小魚',due:'下午下課',at:'court',only:5,go:'去籃球場',act:'找小魚，約放學',done:{yu:1},failTrust:{yu:-1},fail:'小魚等不到你，跟別人去書店了。'}
+},
+/* 下課時，除了自己的事以外還能去的地方；home 是「回去休息、等上課」 */
+breakExtras:[{d:'shop',l:'去合作社',s:'買點心'},{d:'court',l:'去籃球場',s:'打球'}],
+home:{d:'cls',l:'回教室休息',s:'等上課'},
+arrivalCards:{shop:'coin',court:'hoop'},    // 到了某個地點會遇到的事（一天一次）
+breakMinutes:10,
+minPerSec:.6,                               // 下課時，真實 1 秒 = 幾分鐘
+
+/* ---------- 5. 一天的時段 ----------
+   一般時段：dest 要走去的地點（可給陣列隨機選一個）、cards 依序出現的事件卡、need 最後的「換你需要幫忙」
+   下課時段：free:true、route 路上會遇到的事件、coldRoute 校園冷時多遇到的事件
+   cards 寫法：'卡片編號'、{pick:[a,b]} 隨機一張、{if:{flag:'旗標'}, then:'卡', else:'卡'}、{if:{trust:['人物',2]}, then, else} */
+phases:[
+  {n:'到校',t:460,end:480,dest:'cls',lim:22,cards:['jiaen_alone','zhe_hw']},
+  {n:'下課',t:530,end:540,free:true,route:['mi','teacher']},
+  {n:'分組課',t:540,end:580,dest:['cls','lib'],lim:20,cards:[{if:{flag:'zheCopied'},then:'zhe_caught'},{pick:['poster','essay']}]},
+  {n:'午餐',t:720,end:750,dest:'cls',lim:22,cards:[{if:{trust:['jiaen',2]},then:'lunch_b',else:'lunch_a'}],need:'spill'},
+  {n:'打掃',t:760,end:780,dest:'fld',lim:22,cards:[{if:{trust:['zhe',2]},then:'sweep_a',else:'sweep_b'}]},
+  {n:'下課',t:830,end:840,free:true,route:['dou','lele'],coldRoute:['corner']},
+  {n:'體育課',t:840,end:880,dest:'fld',lim:22,cards:['relay'],need:'pe'},
+  {n:'放學',t:960,end:980,dest:'gate',lim:24,cards:[{if:{flag:'miHelped'},then:'bye_mi',else:'bye_py'}],need:'rain'}
+],
+
+/* ---------- 選擇的種類與溫度規則 ---------- */
+types:{
   w:{n:'真心',d:6,tr:2,why:'看清楚對方需要什麼，願意花一點自己的時間或冒一點險。'},
   m:{n:'沒看清楚',d:0,tr:0,why:'想幫忙，但沒有先看清楚對方需要什麼，結果讓對方更不自在。'},
   o:{n:'剛好',d:0,tr:0,why:'看清楚狀況之後，選擇不打擾、或守住自己的界線，在那個情況下剛剛好。'},
   p:{n:'做表面',d:0,tr:0,why:'看起來友善，其實是為了被喜歡、有面子，或少一點麻煩。當下感覺不錯，事情常常沒有真的變好。'},
   c:{n:'路過',d:-4,tr:-1,why:'沒有傷害誰，只是沒有停下來。'},
   h:{n:'傷人',d:-6,tr:-2,why:'跟著大家一起笑、一起怪人，或用讓人難受的方式說話。'}
-};
-/* 自己的事 */
-const TASKS={
-  glue:{n:'去合作社買膠水',s:'膠水',due:'第一節下課（第三節分組要用）',at:'shop',ph:1,fail:'第三節分組課沒有膠水，海報只好用膠帶黏，貼歪了一角。'},
-  form:{n:'把運動會報名表交到辦公室',s:'報名表',due:'第一節下課',at:'off',ph:1,fail:'報名表晚交了，大隊接力的名單裡沒有你。'},
-  book:{n:'把《小王子》還到圖書室',s:'還書',due:'今天放學前',at:'lib',ph:-1,fail:'書逾期了，圖書室登記你這星期不能借書。'},
-  go:{n:'把借來的圍棋還給六年級的宇翔學長',s:'圍棋',due:'今天放學前',at:'six',ph:-1,fail:'圍棋沒還，宇翔學長放學時在你們班門口等了 5 分鐘。'},
-  yu:{n:'去籃球場找小魚，約放學一起去書店',s:'找小魚',due:'下午下課',at:'court',ph:5,fail:'小魚等不到你，跟別人去書店了。'}
-};
-/* ================= 事件卡 =================
-   選項：[文字, 類型, 結果, {cost:分鐘, d, tr, f:旗標, by:旁觀者, v:{A:{...},B:{...}} 依線索不同而不同}]
-   卡片 vars：同一個情境的兩種線索，{v} 會換成其中一種 */
-function C(id,who,ti,tx,ops,vars){return {id,who,ti,tx,vars,ops:ops.map(o=>Object.assign({l:o[0],t:o[1],r:o[2]},o[3]||{}))}}
-/* V：同一個做法，在兩種線索下結果不同。V(選項, [A類型, A結果, {A額外}], [B類型, B結果, {B額外}], {共同設定}) */
-function V(l,a,b,ex){return [l,'',' ',Object.assign({v:{A:Object.assign({t:a[0],r:a[1]},a[2]||{}),B:Object.assign({t:b[0],r:b[1]},b[2]||{})}},ex||{})]}
-const CARDS=Object.fromEntries([
-/* ---------- 到校 ---------- */
+},
+warmLine:65, coldLine:35,           // 高於 warmLine 算暖，低於 coldLine 算冷
+envRules:{                          // 冷暖校園裡，同一個選擇效果的變化（機率、增減）
+  w:{warm:{p:.4,add:3,k:'echo'},cold:{p:.35,add:-3,min:2,k:'doubt'}},
+  c:{warm:{p:.5,set:-2,k:'cover'},cold:{p:.5,add:-2,k:'alone'}},
+  h:{warm:{p:.5,add:2,k:'stop'},cold:{p:.5,add:-2,k:'mock'}},
+  p:{cold:{p:.3,add:-2,k:'seen'}}
+},
+envText:{
+  echo:{lab:'校園暖，善意被放大',say:['旁邊的同學看到了，也過來一起幫忙。','後來你聽到，有人也學你這樣做了。']},
+  doubt:{lab:'校園冷，善意不容易被接住',say:['旁邊有人小聲說：「裝好人喔。」','對方愣了一下，好像不太敢相信有人會停下來。']},
+  alone:{lab:'校園冷，沒有人補上',say:['也沒有別人停下來。','大家都低著頭走過去，就像你一樣。']},
+  cover:{lab:'校園暖，有人補上',say:['後來，有別的同學補上了。']},
+  mock:{lab:'校園冷，有人跟著笑',say:['旁邊有人跟著一起笑。']},
+  stop:{lab:'校園暖，有人出聲制止',say:['旁邊有人皺了眉頭：「這樣說不好吧。」']},
+  seen:{lab:'校園冷，被看成做樣子',say:['旁邊有人小聲說：「做做樣子而已。」']}
+},
+
+/* ---------- 6. 事件卡 ---------- */
+cards:[
+/* 到校 */
 C('jiaen_alone','jiaen','新來的同學','小恩上星期才轉來。大家圍在一起聊昨天的卡通，{v}',[
   V('大聲喊：「小恩！過來一起聊！」',['m','全班都轉頭看他。他抱著書，小聲說：「我在看書……」臉都紅了。'],['w','他愣了一下，走過來坐在旁邊。聽到一半，他也說了一句。']),
   V('走過去，小聲問他在看什麼',['w','他眼睛一亮：「這隻是棘龍，比暴龍還長！」你們聊了 5 分鐘恐龍。'],['w','他說沒看什麼。你問他喜不喜歡那部卡通，他點點頭，跟你走過去了。']),
@@ -256,7 +363,7 @@ C('zhe_hw','zhe','借我抄一下','早自習還有 15 分鐘。阿哲小聲說�
   V('「我要背單字，你問別人好了。」',['c','他沒有再問別人，趴在桌上。下課時你才看到，他書包裡有一張醫院的掛號單。'],['o','他轉去問別人。這個月已經第三次了，總要有人跟他說不。']),
   V('「你昨天怎麼不早一點寫？」',['h','他說：「我阿嬤住院……」聲音越來越小。你這才看到他眼睛紅紅的。'],['m','他說：「忘了啦。」你說得沒錯，可是他只覺得你在唸他，沒有想要改。'])],
   {A:'他的眼睛紅紅的，書包口露出一張醫院的掛號單。',B:'這是他這個月第三次跟你借作業了。'}),
-/* ---------- 分組課 ---------- */
+/* 分組課 */
 C('zhe_caught','zhe','一模一樣的第 4 題','林老師把兩本習作放在一起。阿哲和你的第 4 題，錯得一模一樣。老師問：「誰可以告訴我發生什麼事？」{v}',[
   V('舉手說：「是我借他的。」',['w','阿哲鬆了一口氣。老師說：「謝謝你說實話。下課你們兩個來找我，我們一起把第 4 題弄懂。」'],['w','阿哲瞪了你一眼。下課後老師陪你們把第 4 題弄懂，阿哲才小聲說：「其實你說出來比較好。」']),
   V('不說話，等老師自己查',['c','阿哲的手一直抖。他被留下來重寫，他沒有看你。'],['c','老師看了你們很久。阿哲被留下來重寫，他對你點點頭，好像在說謝謝。']),
@@ -275,7 +382,7 @@ C('essay','jiaen','我寫得好嗎？','小恩把作文拿給你看。題目是�
   ['「我也不太會寫作文，你問老師啦。」','c','他拿著作文站了一會兒，走回座位。'],
   V('「你寫錯題目了耶。」',['w','他說：「真的耶！」馬上拿回去改。他要的就是有人直接告訴他。',{d:4}],['m','你說的是真的。他說：「喔。」把作文紙對折收起來，沒有問你要怎麼改。'])],
   {A:'他說：「明天就要交了，可以幫我看看哪裡要改嗎？」',B:'他笑得很開心：「我寫完了！是不是很棒？」'}),
-/* ---------- 午餐 ---------- */
+/* 午餐 */
 C('lunch_a','jiaen','最後一排','午餐時間。小恩一個人坐在教室最後一排，{v}你的好朋友們已經幫你留了位子，正在叫你。',[
   V('端著餐盤坐到小恩旁邊',['w','朋友們喊：「你不來喔？」你和小恩比賽誰先吃完青菜，他贏了。'],['o','他拿下一邊耳機，對你點點頭，又繼續看漫畫。你們安安靜靜吃完了午餐。']),
   V('跟朋友說：「我們找小恩一起坐好不好？」',['w','有一個朋友皺了一下眉頭，還是挪出一個位子。小恩端著餐盤走過來。'],['m','朋友大聲叫他，他嚇了一跳，拿下耳機走過來，一整餐都沒說話。']),
@@ -286,7 +393,7 @@ C('lunch_b','jiaen','我可以坐這裡嗎？','午餐時間，小恩端著餐�
   ['「這邊……好像有人了耶。」','h','其實沒有人。他端著餐盤，走回最後一排。'],
   ['低頭繼續吃，沒有回答','c','他站了一會兒，走回最後一排。']],
   {A:'他的聲音很小，好像鼓起了很大的勇氣。',B:'他笑嘻嘻的，後面還跟著兩個同學。'}),
-/* ---------- 打掃 ---------- */
+/* 打掃 */
 C('sweep_a','zhe','打掃時間','你們負責掃操場旁的落葉。阿哲拿著掃把跑過來：「早上謝謝你！這一區我來掃！」{v}',[
   V('「一起掃比較快！」',['w','你們 10 分鐘就掃完了，還比賽誰的落葉堆比較高。'],['w','你搶著掃比較遠的那一半。掃完時，他說：「你人真的很好欸。」']),
   V('「好啊，那我去玩了。」',['c','他一個人掃完了。掃完時，你已經不見了。'],['c','他一個人掃完了，手上的 OK 繃髒掉了。',{d:-6}]),
@@ -298,14 +405,14 @@ C('sweep_b','zhe','打掃時間','你們負責掃操場旁的落葉。阿哲拿�
   ['掃自己的，反正衛生股長會管他','c','衛生股長在另一區。他那一半的落葉，被風吹到你這邊。',{by:1}],
   V('「你自己的區域自己掃啦。」',['m','他嘟囔著掃完，練鼓隊遲到了 5 分鐘。'],['m','他說：「看吧，大家都只會唸我。」掃把一丟就走了。'])],
   {A:'他一直看手錶：「我等一下要練鼓隊，好怕遲到……」',B:'他說：「反正我掃了，也會被說掃不乾淨。」'}),
-/* ---------- 體育課 ---------- */
+/* 體育課 */
 C('relay','yu','接力賽','體育課跑接力。最後一棒的小魚跌倒了，你們這隊輸了。隊上有人說：「都是她害的。」{v}',[
   V('走過去問她：「有沒有受傷？」',['w','她的膝蓋擦破皮。你陪她去沖水，她小聲說：「謝謝。」'],['w','她說沒受傷，只是很丟臉。你說：「我上次也跌倒過。」她笑了一下。']),
   ['喊一聲「沒關係啦！」就去排隊','p','她點點頭，還是一直低著頭。'],
   ['大家都在說，你沒有說話','c','小魚自己拍掉膝蓋上的沙，一個人走到隊伍最後面。',{by:1}],
   ['「下次換別人跑最後一棒好了。」','h','有人說：「對啊！」小魚走到操場角落，一個人坐著。']],
   {A:'她坐在地上，膝蓋在流血。',B:'她馬上站起來，眼眶紅紅的，一直說「對不起」。'}),
-/* ---------- 放學 ---------- */
+/* 放學 */
 C('bye_mi','mi','一張畫','放學時，小米跑過來塞給你一張畫：一個高高的人，牽著一個小小的人。她說：「我今天也幫一個新同學找到教室了！」{v}',[
   V('「謝謝你！我會收好。」',['w','她開心地跑回媽媽身邊。你把畫夾進聯絡簿。'],['w','她笑得眼睛都瞇起來了。你把畫夾進聯絡簿，錯字也一起留著。']),
   ['收下，隨手塞進書包','c','那張畫在書包裡被壓皺了。'],
@@ -316,9 +423,9 @@ C('bye_py','py','校門口','品妍學姊在校門口等家長，家長一直沒
   V('指給她看：「警衛室在那邊。」',['w','她點點頭，深吸一口氣，自己走過去了。',{d:3,tr:1}],['o','她說：「我知道啦，謝謝！」']),
   V('安親班老師在等，先走了',['c','你回頭看，她還站在校門口。'],['o','你回頭看，她已經在警衛室裡講電話了。'])],
   {A:'她一直看著校門外，手緊緊抓著書包帶，說她從來沒進去過警衛室。',B:'她說：「我打個電話給我爸就好，很快，你不用管我啦。」'}),
-/* ---------- 下課：路上遇到 ---------- */
+/* 下課：路上遇到 */
 C('mi','mi','走廊轉角','你經過走廊轉角。一年級的小米蹲在牆邊，{v}旁邊有兩個一年級的小朋友站著看她。',[
-  V('停下來，蹲下問她：「你怎麼了？」',['w','她說上完廁所找不到教室。你牽她走回一年級教室，她的老師正在找她。',{f:'miHelped'}],['o','她說：「我在等姊姊！」又繼續滾彈珠。你花 1 分鐘，知道她沒事。',{cost:1}],{cost:3}),
+  V('停下來，蹲下問她：「你怎麼了？」',['w','她說上完廁所找不到教室。你牽她走回一年級教室，她的老師正在找她。',{f:'miHelped',trMin:2}],['o','她說：「我在等姊姊！」又繼續滾彈珠。你花 1 分鐘，知道她沒事。',{cost:1}],{cost:3}),
   V('旁邊有人在看，應該有人會處理',['c','你走過去了。那兩個小朋友也只是看著她。',{by:1}],['o','你走過去了。她好像也沒事。']),
   V('叫旁邊的小朋友去陪她',['c','他們你看我、我看你，誰也沒動。',{by:1}],['o','小朋友說：「她在等她姊姊啦。」'],{cost:1}),
   V('先去辦自己的事，回來再看她還在不在',['c','你回來的時候，她不在了。你不知道她後來怎麼了。'],['o','你回來的時候，她已經跟姊姊走了。'])],
@@ -345,7 +452,7 @@ C('corner','kai','膝蓋流血了','你經過操場邊。一個你不認識的�
   V('繼續走',['c','他還坐在那裡。'],['o','他朋友扶他站起來了。']),
   ['跟朋友說：「他是不是在裝的？」','h','他聽到了，站起來一拐一拐地走掉。']],
   {A:'一直盯著傷口看，旁邊沒有人。',B:'他的朋友拿著衛生紙跑過來了。'}),
-/* ---------- 下課：到了目的地 ---------- */
+/* 下課：到了目的地 */
 C('coin','py','合作社前面','合作社前面在排隊。前面的品妍學姊零錢掉了一地，後面的人一直催她。{v}',[
   V('蹲下來幫她撿',['w','你們撿回 7 個十元。學姊說：「謝謝，你是哪一班的？」'],['w','你們很快就撿完了。學姊說：「謝啦！」',{d:4}],{cost:2}),
   V('跟後面的人說：「等一下啦，她在撿。」',['w','後面的人安靜了。學姊撿完，回頭跟你點點頭。',{d:4}],['o','後面的人笑著說：「我們知道啦！」'],{cost:1}),
@@ -358,33 +465,60 @@ C('hoop','yx','籃球場','你到了籃球場。六年級的宇翔學長他們�
   V('算了，等他們打完',['c','你們在旁邊站到鐘響。'],['o','你們去操場玩鬼抓人。公告上寫著，明天輪到你們。']),
   ['跟同學小聲說：「六年級的好霸道。」','h','學長聽到了，故意把球丟到你們腳邊。']],
   {A:'學長他們已經打了一整節下課，每天都這樣。',B:'旁邊牆上貼著體育老師寫的公告：「本週六年級班際比賽練習時間」。'})
-].map(c=>[c.id,c]));
-/* 換你需要幫忙 */
-const NEEDS={
+],
+
+/* ---------- 7. 換你需要幫忙 ----------
+   helpers：可能來幫你的人（信任最高、且大於 1 的人會來）；沒有人時，校園夠暖（≥60）會有路人幫忙 */
+needs:{
   spill:{ti:'打翻了',tx:'你端著湯回座位，被椅腳絆了一下。整碗湯灑在地上，還濺到你的褲子。',
-    helpers:['zhe','jiaen','yu'],help:'拿了一包衛生紙跑過來，蹲下來幫你擦地。',
+    helpers:['zhe','jiaen','yu'],help:'拿了一包衛生紙跑過來，蹲下來幫你擦地。',stranger:'隔壁的同學',
     none:'幾個人往這邊看了一眼，又轉回去吃飯。你一個人擦了很久。'},
   pe:{ti:'兩人一組',tx:'體育老師說：「兩人一組，練習傳球。」大家很快就找到同伴，只剩你一個人。',
-    helpers:['jiaen','zhe','yu'],help:'跑過來說：「我跟你一組！」',
+    helpers:['jiaen','zhe','yu'],help:'跑過來說：「我跟你一組！」',stranger:'隔壁班的同學',
     none:'最後，體育老師說：「那你跟老師一組吧。」'},
   rain:{ti:'下雨了',tx:'放學時突然下大雨。你忘了帶傘，家長 30 分鐘後才會到。',
-    helpers:['py','yx','zhe','jiaen','yu','dou','mi'],help:'把傘撐到你頭上：「我陪你一起等。」',
+    helpers:['py','yx','zhe','jiaen','yu','dou','mi'],help:'把傘撐到你頭上：「我陪你一起等。」',stranger:'一個路過的同學',
     special:{mi:'拉著媽媽走過來：「媽媽，我們可以陪他等一下嗎？」'},
     none:'大家撐著傘，從你旁邊走過去。你在警衛室屋簷下等了 30 分鐘。'}
+},
+needWarm:60,
+
+/* ---------- 8. 開場自評、結算頁 ---------- */
+selfCheck:{q:'在學校看到有人需要幫忙，你通常會怎麼做？',
+  options:{a:'馬上過去幫忙',b:'先看看情況，需要的話就幫',c:'通常會等別人去處理'},hint:'選好就會走進校門，時間是 07:40。'},
+tiers:[
+  {min:75,n:'暖洋洋的校園',d:'走廊上，大家兩兩一起走、一起笑。你沒空停下來的時候，也有別人停下來了。'},
+  {min:50,n:'有陽光的校園',d:'今天大部分的人都被好好對待了。也有幾個人，還在等有人走過去。'},
+  {min:25,n:'陰天的校園',d:'大家各忙各的。沒有人故意傷害誰，可是需要幫忙的人，常常等不到人。'},
+  {min:0,n:'結冰的校園',d:'走廊上很安靜，每個人都低著頭走路。需要幫忙的人越來越多，願意停下來的人越來越少。'}
+],
+endNotes:[
+  {title:'同一個選擇，在不同溫度的校園，效果不一樣',text:'校園暖的時候，你的善意比較容易被別人學起來，你沒停下來時也常有人補上；校園冷的時候，善意比較容易被懷疑，你走過去也不會有人補上。所以暖的地方會越來越暖，冷的地方會越來越冷。'},
+  {title:'旁觀者效應',text:'旁邊的人越多，每個人越覺得「應該有別人會處理」。1968 年，心理學家 Darley 和 Latané 讓受試者透過對講機聽到有人發病：以為只有自己聽到時，85% 的人在對方發病期間就去求助；以為還有 4 個人也聽到時，只剩 31%。'}
+],
+questions:[
+  '開始前你說自己通常會「{self}」。今天的選擇跟你想的一樣嗎？差在哪裡？',
+  '停下來幫忙，讓你哪件「自己的事」沒做完？在真的學校，你會怎麼選？',
+  '小恩在看書時，和一直看著大家時，你的做法應該一樣嗎？你是從哪裡看出來的？',
+  '「旁邊有人在看，應該有人會處理」，你在學校遇過這種時候嗎？那時候，最後有人去處理嗎？'],
+closing:'明天的校園會是幾度，你覺得由誰決定呢？'
 };
-const SELF={a:'馬上過去幫忙',b:'先看看情況，需要的話就幫',c:'通常會等別人去處理'};
-const QUESTIONS=[
- '開始前你說自己通常會「{self}」。今天的選擇跟你想的一樣嗎？差在哪裡？',
- '停下來幫忙，讓你哪件「自己的事」沒做完？在真的學校，你會怎麼選？',
- '小恩在看書時，和一直看著大家時，你的做法應該一樣嗎？你是從哪裡看出來的？',
- '「旁邊有人在看，應該有人會處理」，你在學校遇過這種時候嗎？那時候，最後有人去處理嗎？'];
+
+</script>
+<script>
+/* =====================================================================
+   遊戲範本：引擎（做新遊戲時不需要修改這個區塊）
+   ===================================================================== */
+const PPL=GAME.people,TYPE=GAME.types,TASKS=GAME.tasks,NEEDS=GAME.needs,PHASES=GAME.phases;
+const CARDS=Object.fromEntries(GAME.cards.map(c=>[c.id,c]));
+const KEY=k=>GAME.id+'_'+k;
+const store={get(k){try{return localStorage.getItem(KEY(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(KEY(k),v)}catch(e){}}};
 
 /* ================= 聲音 ================= */
 const AU=(()=>{
-  let ctx=null,master,music,sfx,timer=null,step=0,nextT=0,on=true,warm=.5;
-  try{on=localStorage.getItem('wd_snd')!=='0'}catch(e){}
+  let ctx=null,master,music,sfx,timer=null,step=0,nextT=0,on=store.get('snd')!=='0',warm=.5;
   const mf=m=>440*Math.pow(2,(m-69)/12);
-  // 原創旋律，C 大調；校園變冷時改成小調、放慢
+  // 原創旋律，C 大調；變冷時改成小調、放慢
   const MEL=[60,64,67,72,71,67,64,67, 65,69,72,69,67,64,62,0, 60,64,67,69,67,64,65,64, 62,65,69,67,65,64,62,0,
              64,67,72,71,69,67,69,71, 72,71,69,67,65,64,62,64, 65,64,62,60,62,64,67,64, 62,59,62,64,60,0,0,0];
   const BASS=[48,45,41,43,48,45,41,43];
@@ -409,7 +543,6 @@ const AU=(()=>{
       nextT+=e;step++}}
   function bgmStart(){if(!ctx)return;bgmStop();step=0;nextT=ctx.currentTime+.6;timer=setInterval(sched,30)}
   function bgmStop(){if(timer){clearInterval(timer);timer=null}}
-  function setWarm(v){warm=v}
   function duck(v){if(!ctx)return;music.gain.setTargetAtTime(v?.15:.45,ctx.currentTime,.15)}
   function bell(){if(!ctx)return;const N=[64,60,62,55, 55,62,64,60],t0=ctx.currentTime+.05;
     N.forEach((m,i)=>{const t=t0+i*.45+(i>=4?.3:0),f=mf(m+12);tone(f,t,1.4,'sine',.14,sfx,.005);tone(f*2.01,t,.7,'sine',.04,sfx,.005)})}
@@ -420,23 +553,21 @@ const AU=(()=>{
   function tick(){if(!ctx)return;tone(1600,ctx.currentTime,.05,'square',.03)}
   function ding(){if(!ctx)return;const t=ctx.currentTime;tone(mf(84),t,.4,'sine',.1);tone(mf(91),t+.08,.5,'sine',.08)}
   function ending(v){if(!ctx)return;const t=ctx.currentTime+.05,seq=v>=.5?[72,76,79,84]:[69,72,76,69];seq.forEach((m,i)=>tone(mf(v>=.5?m:toMinor(m)),t+i*.2,i===3?1.4:.4,'triangle',.1))}
-  function setOn(v){on=v;try{localStorage.setItem('wd_snd',v?'1':'0')}catch(e){}if(master&&ctx)master.gain.setTargetAtTime(v?1:0,ctx.currentTime,.05)}
+  function setOn(v){on=v;store.set('snd',v?'1':'0');if(master&&ctx)master.gain.setTargetAtTime(v?1:0,ctx.currentTime,.05)}
   function pause(v){if(!ctx)return;v?ctx.suspend():ctx.resume()}
-  return {init,bgmStart,bgmStop,setWarm,duck,bell,up,down,rustle,click,tick,ding,ending,setOn,pause,get on(){return on}};
+  return {init,bgmStart,bgmStop,setWarm:v=>{warm=v},duck,bell,up,down,rustle,click,tick,ding,ending,setOn,pause,get on(){return on}};
 })();
 const VO=(()=>{
   const ok=typeof speechSynthesis!=='undefined'&&typeof SpeechSynthesisUtterance!=='undefined';
-  let voice=null,auto=false;
-  try{auto=localStorage.getItem('wd_vo')==='1'}catch(e){}
+  let voice=null,auto=store.get('vo')==='1';
   function pickVoice(){if(!ok)return;const vs=speechSynthesis.getVoices();voice=vs.find(v=>/zh[-_]TW/i.test(v.lang))||vs.find(v=>/zh/i.test(v.lang))||null}
   if(ok){pickVoice();try{speechSynthesis.addEventListener('voiceschanged',pickVoice)}catch(e){}}
   function speak(text){if(!ok)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=voice?voice.lang:'zh-TW';if(voice)u.voice=voice;u.rate=1;speechSynthesis.speak(u)}catch(e){}}
   function stop(){if(ok)try{speechSynthesis.cancel()}catch(e){}}
-  function setAuto(v){auto=v;try{localStorage.setItem('wd_vo',v?'1':'0')}catch(e){}if(!v)stop()}
+  function setAuto(v){auto=v;store.set('vo',v?'1':'0');if(!v)stop()}
   return {ok,speak,stop,setAuto,get auto(){return auto}};
 })();
-/* 倒數秒數（老師可在開始頁調整，0 = 關閉） */
-let CD_SECS=15;try{const v=localStorage.getItem('wd_cd');if(v!==null)CD_SECS=+v}catch(e){}
+let CD_SECS=GAME.countdown;{const v=store.get('cd');if(v!==null)CD_SECS=+v}
 
 /* ================= 工具 ================= */
 const R=Math.random;
@@ -448,65 +579,57 @@ const fmt=t=>{t=Math.floor(t);return String(Math.floor(t/60)).padStart(2,'0')+':
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
-/* ================= 校園地圖 ================= */
-const TS=32,MW=36,MH=24;
-const ROOMS=[
- {id:'low',n:'一年級教室',x:1,y:1,w:7,h:4,dx:4,dy:4,out:1},
- {id:'cls',n:'五年三班',x:9,y:1,w:8,h:4,dx:13,dy:4,out:1},
- {id:'six',n:'六年級教室',x:18,y:1,w:7,h:4,dx:21,dy:4,out:1},
- {id:'lib',n:'圖書室',x:26,y:1,w:5,h:4,dx:28,dy:4,out:1},
- {id:'nur',n:'保健室',x:32,y:1,w:3,h:4,dx:33,dy:4,out:1},
- {id:'off',n:'辦公室',x:1,y:8,w:7,h:4,dx:4,dy:8,out:-1},
- {id:'shop',n:'合作社',x:9,y:8,w:5,h:4,dx:11,dy:8,out:-1}
-];
-const COURT={x:9,y:14,w:8,h:6};
-const FIELD={x:19,y:9,w:15,h:13};
-const GARDEN={x:1,y:14,w:7,h:8};
-const TREES=[[2,15],[5,17],[3,19],[6,20],[20,10],[32,10],[20,20],[32,20],[18,13],[17,21]];
-const GATE={x:16,y:22.2};
+/* ================= 地圖 ================= */
+const TS=32,M=GAME.map,MW=M.w,MH=M.h,ROOMS=M.rooms,AREAS=M.areas,TREES=M.trees,GATE=M.gate,PROPS=M.props||[];
+/* 門朝哪個方向：face 寫 down/up/left/right（舊寫法 out:1/-1 也可以） */
+const FACE={down:[0,1],up:[0,-1],left:[-1,0],right:[1,0]};
+ROOMS.forEach(r=>{if(!r.face)r.face=r.out<0?'up':'down';const v=FACE[r.face];r.fx=v[0];r.fy=v[1]});
+const PLACE=Object.assign({},...ROOMS.map(r=>({[r.id]:r.n})),...AREAS.map(a=>({[a.id]:a.n})),{[GATE.id]:GATE.n});
 let grid=[];
 function fillG(x,y,w,h,v){for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)grid[j][i]=v}
 function buildWorld(){
   grid=Array.from({length:MH},()=>Array(MW).fill(0));
   for(let x=0;x<MW;x++){grid[0][x]=1;grid[MH-1][x]=1}
   for(let y=0;y<MH;y++){grid[y][0]=1;grid[y][MW-1]=1}
-  fillG(FIELD.x,FIELD.y,FIELD.w,FIELD.h,2);fillG(GARDEN.x,GARDEN.y,GARDEN.w,GARDEN.h,2);fillG(COURT.x,COURT.y,COURT.w,COURT.h,6);
+  AREAS.forEach(a=>fillG(a.x,a.y,a.w,a.h,a.kind==='court'?6:2));
   ROOMS.forEach(r=>{fillG(r.x,r.y,r.w,r.h,1);grid[r.dy][r.dx]=3});
   TREES.forEach(([x,y])=>grid[y][x]=4);
+  PROPS.forEach(p=>grid[p.y][p.x]=5);
 }
 function walkable(x,y){const tx=Math.floor(x),ty=Math.floor(y);if(tx<0||ty<0||tx>=MW||ty>=MH)return false;const c=grid[ty][tx];return c===0||c===2||c===6}
 function blocked(x,y,r){return !walkable(x-r,y-r)||!walkable(x+r,y-r)||!walkable(x-r,y+r)||!walkable(x+r,y+r)}
 function moveEnt(e,dx,dy,r){const ox=e.x,oy=e.y;if(!blocked(e.x+dx,e.y,r))e.x+=dx;if(!blocked(e.x,e.y+dy,r))e.y+=dy;return Math.hypot(e.x-ox,e.y-oy)}
-function randTile(near,rad){for(let k=0;k<60;k++){const x=near?clamp(Math.floor(near.x)+rint(-rad,rad),1,MW-2):rint(1,MW-2);const y=near?clamp(Math.floor(near.y)+rint(-rad,rad),1,MH-2):rint(1,MH-2);if(walkable(x+.5,y+.5))return {x:x+.5,y:y+.5}}return {x:16,y:6}}
+function randTile(near,rad){for(let k=0;k<60;k++){const x=near?clamp(Math.floor(near.x)+rint(-rad,rad),1,MW-2):rint(1,MW-2);const y=near?clamp(Math.floor(near.y)+rint(-rad,rad),1,MH-2):rint(1,MH-2);if(walkable(x+.5,y+.5))return {x:x+.5,y:y+.5}}return {x:GATE.x,y:GATE.y-1}}
 const roomById=id=>ROOMS.find(r=>r.id===id);
+const areaById=id=>AREAS.find(a=>a.id===id);
 
 /* ================= 一天的流程 ================= */
-const PHASES=[
- {n:'到校',t:460,end:480,dest:'cls',lim:22,q:()=>['jiaen_alone','zhe_hw']},
- {n:'下課',t:530,end:540,free:1,route:()=>['mi','teacher']},
- {n:'分組課',t:540,end:580,dest:'pick',lim:20,q:()=>(S.flags.zheCopied?['zhe_caught']:[]).concat([pick(['poster','essay'])])},
- {n:'午餐',t:720,end:750,dest:'cls',lim:22,q:()=>[trust('jiaen')>=2?'lunch_b':'lunch_a'],need:'spill'},
- {n:'打掃',t:760,end:780,dest:'fld',lim:22,q:()=>[trust('zhe')>=2?'sweep_a':'sweep_b']},
- {n:'下課',t:830,end:840,free:1,route:()=>S.temp<=35?['dou','lele','corner']:['dou','lele']},
- {n:'體育課',t:840,end:880,dest:'fld',lim:22,q:()=>['relay'],need:'pe'},
- {n:'放學',t:960,end:980,dest:'gate',lim:24,q:()=>[S.flags.miHelped?'bye_mi':'bye_py'],need:'rain'}
-];
-const MIN_PER_SEC=.6;   // 下課時，真實 1 秒 = 0.6 分鐘（10 分鐘下課約 17 秒）
+const FREE_IDX=PHASES.map((p,i)=>p.free?i:-1).filter(i=>i>=0),LAST_FREE=FREE_IDX[FREE_IDX.length-1];
 let S=null;
 function newRun(day,self){
-  S={day:day||1,self:self||(S&&S.self)||'b',t:460,tm:460,ph:-1,phT:0,arrived:false,queue:[],dest:null,temp:40,shown:40,hist:[],tr:{},flags:{},deeds:{},met:new Set(),
-     log:[],others:[],needs:[],fx:[],over:false,task:{glue:0,form:0,book:0,go:0,yu:0},usedArr:{},route:[],leg:null,enc:null,helpMin:0,timeouts:0,by:0};
+  S={day:day||1,self:self||(S&&S.self)||'b',t:PHASES[0].t,tm:PHASES[0].t,ph:-1,phT:0,arrived:false,queue:[],dest:null,temp:GAME.startTemp,shown:GAME.startTemp,hist:[],tr:{},flags:{},deeds:{},met:new Set(),
+     log:[],others:[],needs:[],fx:[],over:false,task:Object.fromEntries(Object.keys(TASKS).map(k=>[k,0])),usedArr:{},route:[],leg:null,enc:null,helpMin:0,timeouts:0,by:0,lastDest:null};
 }
 const trust=w=>S.tr[w]||0;
-const PLACE={cls:'五年三班',lib:'圖書室',shop:'合作社',court:'籃球場',fld:'操場',gate:'校門口',off:'辦公室',six:'六年級教室'};
-function destName(){return PLACE[S.dest]||roomById(S.dest).n}
-function destPoint(){if(S.dest==='fld')return {x:FIELD.x+FIELD.w/2,y:FIELD.y+FIELD.h/2};if(S.dest==='court')return {x:COURT.x+COURT.w/2,y:COURT.y+COURT.h/2};if(S.dest==='gate')return GATE;const r=roomById(S.dest);return {x:r.dx+.5,y:r.dy+.5}}
+function addTrust(map,sign){for(const k in map||{})S.tr[k]=trust(k)+map[k]*(sign||1)}
+/* 解讀時段設定裡的卡片寫法 */
+function testCond(c){if(!c)return true;if(c.flag)return !!S.flags[c.flag];if(c.trust)return trust(c.trust[0])>=c.trust[1];return true}
+function resolveSpec(sp){
+  if(sp==null)return [];
+  if(typeof sp==='string')return [sp];
+  if(Array.isArray(sp))return sp.flatMap(resolveSpec);
+  if(sp.pick)return resolveSpec(pick(sp.pick));
+  if(sp.if)return resolveSpec(testCond(sp.if)?sp.then:sp.else);
+  return [];
+}
+function destName(){return PLACE[S.dest]||S.dest}
+function destPoint(){const a=areaById(S.dest);if(a)return {x:a.x+a.w/2,y:a.y+a.h/2};if(S.dest===GATE.id)return GATE;const r=roomById(S.dest);return {x:r.dx+.5,y:r.dy+.5}}
 function atDest(){
-  if(S.dest==='fld')return P.x>FIELD.x&&P.x<FIELD.x+FIELD.w&&P.y>FIELD.y&&P.y<FIELD.y+FIELD.h;
-  if(S.dest==='court')return P.x>COURT.x&&P.x<COURT.x+COURT.w&&P.y>COURT.y&&P.y<COURT.y+COURT.h;
-  if(S.dest==='gate')return Math.hypot(P.x-GATE.x,P.y-GATE.y)<1.6;
+  const a=areaById(S.dest);if(a)return P.x>a.x&&P.x<a.x+a.w&&P.y>a.y&&P.y<a.y+a.h;
+  if(S.dest===GATE.id)return Math.hypot(P.x-GATE.x,P.y-GATE.y)<1.6;
   const r=roomById(S.dest);return Math.hypot(P.x-(r.dx+.5),P.y-(r.dy+.5))<1.1;
 }
+function jumpToDest(){const d=destPoint();if(areaById(S.dest)||S.dest===GATE.id){P.x=d.x;P.y=d.y}else{const r=roomById(S.dest);P.x=r.dx+.5+r.fx*1.3;P.y=r.dy+.5+r.fy*1.3}}
 
 let P,NPCS=[],running=false,paused=false,userPaused=false,last=0,grace=0,keys={},joy=null,camX=0,camY=0,zoom=1,dpr=1,cvW=0,cvH=0,walkT=0,staticW=null,staticC=null,toastT=null,bannerT=null,hintShown=0,FLAKES=[],cdTimer=null,modalKeys=null;
 const BAGS=['#d0453a','#2e6db4','#e0a526','#3a9a62','#8a4fb3','#d06a2a','#2c8c8c'];
@@ -516,19 +639,21 @@ function initWorld(){
   FLAKES=Array.from({length:46},()=>({x:R(),y:R(),s:.4+R()*.8,o:R()*6}));
 }
 function startPhase(i){
-  S.ph=i;const ph=PHASES[i];AU.bell();S.t=ph.t;S.tm=ph.t;S.phT=0;S.arrived=false;S.enc=null;S.leg=null;S.dest=null;
-  if(i===2&&S.task.glue!==1){toast(TASKS.glue.fail)}
-  if(ph.free){S.route=ph.route().slice();banner(`${fmt(ph.t)}　${ph.n}`,'下課 10 分鐘');hud();setTimeout(()=>{if(S&&S.ph===i&&!S.over)openMenu(true)},900);return}
-  S.dest=ph.dest==='pick'?pick(['cls','lib']):ph.dest;
-  banner(`${fmt(ph.t)}　${ph.n}`,i===0?`今天早上的校園是 40°・走到 ${destName()}`:`走到 ${destName()}`);
+  S.ph=i;const ph=PHASES[i];AU.bell();S.t=ph.t;S.tm=ph.t;S.phT=0;S.arrived=false;S.enc=null;S.leg=null;S.dest=null;S.lastDest=null;
+  if(ph.free){S.route=(ph.route||[]).concat(S.temp<=GAME.coldLine?(ph.coldRoute||[]):[]);
+    banner(`${fmt(ph.t)}　${ph.n}`,`${ph.n} ${ph.end-ph.t} 分鐘`);hud();setTimeout(()=>{if(S&&S.ph===i&&!S.over)openMenu(true)},900);return}
+  S.dest=Array.isArray(ph.dest)?pick(ph.dest):ph.dest;
+  banner(`${fmt(ph.t)}　${ph.n}`,i===0&&GAME.openingLine?`${GAME.openingLine}・走到 ${destName()}`:`走到 ${destName()}`);
   hud();
 }
 function freeLeft(){return Math.max(0,Math.ceil(PHASES[S.ph].end-S.tm))}
 function spend(min){if(!PHASES[S.ph].free||!min)return;S.tm=Math.min(PHASES[S.ph].end,S.tm+min);S.t=S.tm;hud()}
+function taskOpen(k,ph){const t=TASKS[k];return S.task[k]===0&&(t.only==null||t.only===ph)}
 function endFreePhase(){
-  const ph=S.ph;
-  if(ph===1){if(S.task.glue===0)S.task.glue=-1;if(S.task.form===0)S.task.form=-1}
-  if(ph===5){if(S.task.yu===0){S.task.yu=-1;S.tr.yu=trust('yu')-1}if(S.task.book===0)S.task.book=-1;if(S.task.go===0){S.task.go=-1;S.tr.yx=trust('yx')-1}}
+  const ph=S.ph,failed=[];
+  for(const k in TASKS){const t=TASKS[k];const deadline=t.only!=null?t.only:LAST_FREE;
+    if(S.task[k]===0&&deadline===ph){S.task[k]=-1;addTrust(t.failTrust);failed.push(t.s)}}
+  if(failed.length)toast(`上課鐘響了。沒做完：${failed.join('、')}`);
   S.enc=null;S.leg=null;NPCS.forEach(n=>n.goto=null);
 }
 function nextPhase(){
@@ -536,7 +661,7 @@ function nextPhase(){
   if(S.ph+1>=PHASES.length)return renderEnd();
   startPhase(S.ph+1);
 }
-function arrive(){S.arrived=true;S.queue=PHASES[S.ph].q().slice();hud();runQueue()}
+function arrive(){S.arrived=true;S.queue=resolveSpec(PHASES[S.ph].cards);hud();runQueue()}
 function runQueue(){
   const ph=PHASES[S.ph];
   if(S.queue.length){const id=S.queue.shift();return openCard(CARDS[id],`${ph.n}・${destName()}`,runQueue)}
@@ -548,22 +673,18 @@ function changeTemp(d){S.temp=clamp(S.temp+d,0,100);hud();AU.setWarm(S.temp/100)
 /* ===== 下課：選目的地、在路上遇到人 ===== */
 function menuOptions(){
   const ph=S.ph,o=[];
-  if(ph===1&&S.task.form===0)o.push({d:'off',l:'去辦公室',s:'交運動會報名表'});
-  if(S.task.book===0)o.push({d:'lib',l:'去圖書室',s:'還《小王子》'});
-  if(S.task.go===0)o.push({d:'six',l:'去六年級教室',s:'還圍棋給宇翔學長'});
-  if(ph===1)o.push({d:'shop',l:'去合作社',s:S.task.glue===0?'買膠水':'買點心'});
-  else o.push({d:'shop',l:'去合作社',s:'買點心'});
-  o.push({d:'court',l:'去籃球場',s:ph===5&&S.task.yu===0?'找小魚，約放學':'打球'});
-  o.push({d:'cls',l:'回教室休息',s:'等上課'});
-  return o.filter(x=>x.d!==S.lastDest);
+  for(const k in TASKS){if(taskOpen(k,ph)){const t=TASKS[k];if(!o.some(x=>x.d===t.at))o.push({d:t.at,l:t.go||('去'+PLACE[t.at]),s:t.act||t.n})}}
+  (GAME.breakExtras||[]).forEach(x=>{if(!o.some(y=>y.d===x.d))o.push(x)});
+  if(GAME.home)o.push(GAME.home);
+  return o.filter(x=>x.d!==S.lastDest).slice(0,6);
 }
 function taskListHTML(){return `<div class="tasks">${Object.entries(TASKS).map(([k,t])=>`<span><b>${S.task[k]===1?'✓':S.task[k]===-1?'✗':'□'}</b>${esc(t.n)}<small style="color:var(--muted)">・${esc(t.due)}</small></span>`).join('')}</div>`}
 function openMenu(first){
   if(PHASES[S.ph].free&&freeLeft()<=0)return nextPhase();
   const opts=menuOptions();
   showModal(`<section class="note fade-in"><div class="tape"></div>
-    <div class="note-head"><span class="who" style="color:var(--ink)">你自己</span><span>${fmt(S.tm)}・下課</span></div>
-    <h2>${first?'下課了！':'接下來'}還有 ${freeLeft()} 分鐘，要去哪裡？</h2>
+    <div class="note-head"><span class="who" style="color:var(--ink)">你自己</span><span>${fmt(S.tm)}・${esc(PHASES[S.ph].n)}</span></div>
+    <h2>${first?esc(PHASES[S.ph].n)+'了！':'接下來'}還有 ${freeLeft()} 分鐘，要去哪裡？</h2>
     ${first?taskListHTML():''}
     <div class="opts">${opts.map((x,i)=>`<button class="opt" data-i="${i}"><span class="k">${'ABCDEF'[i]}</span><span class="t">${esc(x.l)}<small>${esc(x.s)}</small></span></button>`).join('')}</div></section>`);
   const m=$('modal');
@@ -574,37 +695,32 @@ function openMenu(first){
 function arriveFree(){
   S.arrived=true;const d=S.dest;S.lastDest=d;S.leg=null;
   const done=[];
-  if(d==='lib'&&S.task.book===0){S.task.book=1;spend(1);done.push('還書')}
-  if(d==='shop'&&S.ph===1&&S.task.glue===0){S.task.glue=1;spend(1);done.push('買膠水')}
-  if(d==='off'&&S.ph===1&&S.task.form===0){S.task.form=1;spend(1);done.push('交報名表')}
-  if(d==='six'&&S.task.go===0){S.task.go=1;spend(1);done.push('還圍棋');S.tr.yx=trust('yx')+1}
-  if(d==='court'&&S.ph===5&&S.task.yu===0){S.task.yu=1;spend(1);done.push('跟小魚約好了');S.tr.yu=trust('yu')+1}
+  for(const k in TASKS){const t=TASKS[k];if(t.at===d&&taskOpen(k,S.ph)){S.task[k]=1;spend(t.time||1);addTrust(t.done);done.push(t.s)}}
   if(done.length){AU.ding();toast('✓ '+done.join('、'))}
-  if(d==='cls'){toast('你回到教室，等上課鐘響。');S.tm=PHASES[S.ph].end;return}
-  const arrCard=d==='shop'&&!S.usedArr.coin?'coin':d==='court'&&!S.usedArr.hoop?'hoop':null;
-  if(arrCard){S.usedArr[arrCard]=1;return openCard(CARDS[arrCard],`下課・${PLACE[d]}`,()=>openMenu(false))}
+  if(GAME.home&&d===GAME.home.d){toast(`你${GAME.home.l}，等上課鐘響。`);S.tm=PHASES[S.ph].end;return}
+  const arrCard=(GAME.arrivalCards||{})[d];
+  if(arrCard&&!S.usedArr[arrCard]){S.usedArr[arrCard]=1;return openCard(CARDS[arrCard],`${PHASES[S.ph].n}・${PLACE[d]}`,()=>openMenu(false))}
   openMenu(false);
 }
-/* 在前往目的地的路上，前方出現一個需要幫忙的人 */
 function spawnEncounter(){
   const id=S.route.shift();const c=CARDS[id];
-  let fx=P.fx,fy=P.fy,x=P.x+fx*1.8,y=P.y+fy*1.8;
+  let x=P.x+P.fx*1.8,y=P.y+P.fy*1.8;
   if(blocked(x,y,.3)){const p=randTile(P,2);x=p.x;y=p.y}
   S.enc={id,who:c.who,x,y,state:'open',heart:0,t:.7};
 }
 
 /* ================= 每一格的更新 ================= */
 function updNPC(n,dt){
-  const lead=S.temp>=65&&n.idx%2===1?NPCS[n.idx-1]:null;
+  const lead=S.temp>=GAME.warmLine&&n.idx%2===1?NPCS[n.idx-1]:null;
   if(n.goto){n.tgt={x:n.goto.x+.6,y:n.goto.y+.2}}
   else if(lead){n.tgt={x:lead.x+.7,y:lead.y+.2}}
   else if(!n.tgt||Math.hypot(n.tgt.x-n.x,n.tgt.y-n.y)<.3)n.tgt=randTile(n,7);
   const dx=n.tgt.x-n.x,dy=n.tgt.y-n.y,L=Math.hypot(dx,dy)||1;
-  const spd=n.spd*(S.temp<35?1.25:1)*(lead&&L<.9?.2:1)*(n.goto?1.6:1),s=spd*dt;
+  const spd=n.spd*(S.temp<GAME.coldLine?1.25:1)*(lead&&L<.9?.2:1)*(n.goto?1.6:1),s=spd*dt;
   const m=moveEnt(n,dx/L*s,dy/L*s,.28);n.walk+=m*3;n.moving=m>.001;if(L>.05){n.fx=dx/L;n.fy=dy/L}
   if(m<s*.3&&L>.5){n.stuck+=dt;if(n.stuck>.6){if(!n.goto)n.tgt=randTile(n,4);else{n.x+=(R()-.5)*.4}n.stuck=0}}else n.stuck=0;
   if(n.bub>0)n.bub-=dt;else if(S.temp<40&&R()<dt*.08)n.bub=1.6;
-  if(S.temp>=65&&lead&&R()<dt*.05)S.fx.push({x:(n.x+lead.x)/2,y:(n.y+lead.y)/2-.6,life:1.4});
+  if(S.temp>=GAME.warmLine&&lead&&R()<dt*.05)S.fx.push({x:(n.x+lead.x)/2,y:(n.y+lead.y)/2-.6,life:1.4});
   if(n.goto&&Math.hypot(n.x-n.goto.x,n.y-n.goto.y)<1){const g=n.goto;n.goto=null;for(let k=0;k<4;k++)S.fx.push({x:g.x+(R()-.5),y:g.y-.4-R()*.4,life:1.2+R()*.6})}
 }
 function update(dt){
@@ -619,21 +735,18 @@ function update(dt){
   if(S.enc&&S.enc.heart>0)S.enc.heart-=dt;
   const ph=PHASES[S.ph];S.phT+=dt;
   if(ph.free){
-    S.tm=Math.min(ph.end,S.tm+dt*MIN_PER_SEC);const nt=Math.floor(S.tm);if(nt!==S.t){S.t=nt;hud()}
+    S.tm=Math.min(ph.end,S.tm+dt*GAME.minPerSec);const nt=Math.floor(S.tm);if(nt!==S.t){S.t=nt;hud()}
     grace-=dt;if(grace>0)return;
-    if(S.tm>=ph.end){toast(`上課鐘響了。${S.ph===1&&S.task.glue===0?'膠水還沒買。':''}`);return nextPhase()}
-    if(S.enc&&S.enc.state==='open'){S.enc.t-=dt;if(S.enc.t<=0||Math.hypot(S.enc.x-P.x,S.enc.y-P.y)<1){S.enc.state='talk';const e=S.enc;return openCard(CARDS[e.id],`下課・往${PLACE[S.dest]}的路上`,()=>{},e)}return}
+    if(S.tm>=ph.end)return nextPhase();
+    if(S.enc&&S.enc.state==='open'){S.enc.t-=dt;if(S.enc.t<=0||Math.hypot(S.enc.x-P.x,S.enc.y-P.y)<1){S.enc.state='talk';const e=S.enc;return openCard(CARDS[e.id],`${ph.n}・往${PLACE[S.dest]}的路上`,()=>{},e)}return}
     if(S.leg&&!S.leg.enc&&S.route.length&&Math.hypot(P.x-S.leg.sx,P.y-S.leg.sy)>3.5){S.leg.enc=true;spawnEncounter();return}
     if(S.dest&&!S.arrived&&atDest())return arriveFree();
     return;
   }
-  const lim=ph.lim;
-  const nt=Math.min(ph.end,ph.t+Math.floor(Math.min(1,S.phT/lim)*(ph.end-ph.t)));if(nt!==S.t){S.t=nt;hud()}
+  const nt=Math.min(ph.end,ph.t+Math.floor(Math.min(1,S.phT/ph.lim)*(ph.end-ph.t)));if(nt!==S.t){S.t=nt;hud()}
   grace-=dt;if(grace>0)return;
   if(!S.arrived&&atDest())return arrive();
-  if(!S.arrived&&S.phT>=ph.lim){toast('上課鐘響了，你趕快跑過去。');const d=destPoint();
-    if(S.dest==='fld'||S.dest==='gate'){P.x=d.x;P.y=d.y}else{const r=roomById(S.dest);P.x=r.dx+.5;P.y=r.dy+.5+r.out*1.3}
-    return arrive()}
+  if(!S.arrived&&S.phT>=ph.lim){toast('上課鐘響了，你趕快跑過去。');jumpToDest();return arrive()}
 }
 
 /* ================= HUD、提示 ================= */
@@ -643,51 +756,34 @@ function hud(){
   if(!S||S.ph<0)return;const ph=PHASES[S.ph];
   $('clock').textContent=fmt(S.t);
   $('phName').textContent=`第 ${S.day} 天・${ph.n}`;
-  const tk=Object.entries(TASKS).map(([k,t])=>`<span class="tk ${S.task[k]===1?'ok':S.task[k]===-1?'no':''}">${t.s}</span>`).join('');
+  const tk=Object.entries(TASKS).map(([k,t])=>`<span class="tk ${S.task[k]===1?'ok':S.task[k]===-1?'no':''}">${esc(t.s)}</span>`).join('');
   let g;
-  if(ph.free)g=`下課剩 ${freeLeft()} 分鐘${S.dest&&!S.arrived?`・去${PLACE[S.dest]}`:''}`;
+  if(ph.free)g=`${ph.n}剩 ${freeLeft()} 分鐘${S.dest&&!S.arrived?`・去${PLACE[S.dest]}`:''}`;
   else g=S.arrived?`${ph.n}中`:`目標：走到 ${destName()}`;
   $('goal').innerHTML=`<span>${esc(g)}</span>${tk}`;
-  $('flow').innerHTML=PHASES.map((p,i)=>`<span class="${i<S.ph?'done':i===S.ph?'now':''}">${p.n}</span>`).join('');
+  $('flow').innerHTML=PHASES.map((p,i)=>`<span class="${i<S.ph?'done':i===S.ph?'now':''}">${esc(p.n)}</span>`).join('');
   const cur=$('flow').querySelector('.now');if(cur&&cur.scrollIntoView)try{cur.scrollIntoView({block:'nearest',inline:'center'})}catch(e){}
 }
 function syncAudioBtns(){$('sndBtn').setAttribute('aria-pressed',AU.on?'true':'false');const v=$('voBtn');v.hidden=!VO.ok;v.setAttribute('aria-pressed',VO.auto?'true':'false')}
 
 /* ================= 紙條：事件卡 ================= */
-function showModal(html){
-  paused=true;joy=null;keys={};stopCd();
-  const m=$('modal');m.innerHTML=html;$('shade').hidden=false;m.hidden=false;m.scrollTop=0;AU.duck(true);AU.rustle();
-}
+function showModal(html){paused=true;joy=null;keys={};stopCd();const m=$('modal');m.innerHTML=html;$('shade').hidden=false;m.hidden=false;m.scrollTop=0;AU.duck(true);AU.rustle()}
 function closeModal(after){stopCd();modalKeys=null;VO.stop();AU.duck(false);$('modal').hidden=true;$('shade').hidden=true;paused=userPaused;grace=.5;hud();after&&after()}
 function stopCd(){if(cdTimer){clearInterval(cdTimer);cdTimer=null}}
-/* 環境溫度會改變同一個選擇的效果（機率），並在故事裡用一句話呈現 */
-const ENV_TXT={
-  echo:['旁邊的同學看到了，也過來一起幫忙。','後來你聽到，有人也學你這樣做了。'],
-  doubt:['旁邊有人小聲說：「裝好人喔。」','對方愣了一下，好像不太敢相信有人會停下來。'],
-  alone:['也沒有別人停下來。','大家都低著頭走過去，就像你一樣。'],
-  cover:['後來，有別的同學補上了。'],
-  mock:['旁邊有人跟著一起笑。'],
-  stop:['旁邊有人皺了眉頭：「這樣說不好吧。」'],
-  seen:['旁邊有人小聲說：「做做樣子而已。」']
-};
-const ENV_LAB={echo:'校園暖，善意被放大',doubt:'校園冷，善意不容易被接住',alone:'校園冷，沒有人補上',cover:'校園暖，有人補上',mock:'校園冷，有人跟著笑',stop:'校園暖，有人出聲制止',seen:'校園冷，被看成做樣子'};
 function envAdjust(t,d,enc){
-  const T=S.temp;let k=null;
-  if(t==='w'){if(T>=65&&R()<.4){d+=3;k='echo'}else if(T<35&&R()<.35){d=Math.max(2,d-3);k='doubt'}}
-  else if(t==='c'){if(T>=65&&R()<.5){d=-2;k='cover'}else if(T<35&&R()<.5){d-=2;k='alone'}}
-  else if(t==='h'){if(T<35&&R()<.5){d-=2;k='mock'}else if(T>=65&&R()<.5){d+=2;k='stop'}}
-  else if(t==='p'){if(T<35&&R()<.3){d-=2;k='seen'}}
-  const note=k&&!(k==='cover'&&enc)?pick(ENV_TXT[k]):'';
+  const rule=(GAME.envRules||{})[t];let r=null;
+  if(rule){if(S.temp>=GAME.warmLine)r=rule.warm;else if(S.temp<GAME.coldLine)r=rule.cold}
+  if(!r||R()>=r.p)return {d,k:null,note:''};
+  if(r.set!=null)d=r.set;else d=d+r.add;if(r.min!=null)d=Math.max(r.min,d);
+  const k=r.k,note=(k==='cover'&&enc)?'':pick(GAME.envText[k].say);
   return {d,k,note};
 }
-/* 依線索版本，算出這個選項實際的結果 */
 function resolveOp(op,vk){const v=op.v&&op.v[vk]?op.v[vk]:{};return Object.assign({},op,v)}
 function openCard(c,place,after,enc){
   const p=PPL[c.who];S.met.add(c.who);
   const vk=c.vars?pick(Object.keys(c.vars)):null;
   const tx=c.vars?c.tx.replace('{v}',c.vars[vk]):c.tx;
-  const opts=shuffle(c.ops);
-  const free=PHASES[S.ph].free;
+  const opts=shuffle(c.ops),free=PHASES[S.ph].free;
   showModal(`<section class="note fade-in"><div class="tape"></div>
     ${CD_SECS>0?'<div class="cd" id="cd"><i id="cdBar"></i></div>':''}
     <div class="note-head"><span class="who" style="color:${p.c}">${esc(p.r)}・${esc(p.n)}</span><span>${fmt(S.t)}・${esc(place)}</span>${VO.ok?'<button class="speak" id="speakBtn">朗讀</button>':''}</div>
@@ -700,10 +796,9 @@ function openCard(c,place,after,enc){
   const say=`${c.ti}。${tx}`+opts.map((x,i)=>`。${'ABCD'[i]}，${x.l}`).join('');
   const sb=$('speakBtn');if(sb)sb.onclick=()=>VO.speak(say);if(VO.auto)VO.speak(say);
   modalKeys=e=>{const k='1234'.indexOf(e.key)>=0?'1234'.indexOf(e.key):'abcd'.indexOf(e.key.toLowerCase());const bs=m.querySelectorAll('.opt');if(k>=0&&bs[k]&&!bs[k].disabled)bs[k].click()};
-  // 倒數：時間到還沒選，就算「路過」
   if(CD_SECS>0){let left=CD_SECS;const bar=$('cdBar'),box=$('cd');
     cdTimer=setInterval(()=>{if(userPaused)return;left-=.1;bar.style.width=Math.max(0,left/CD_SECS*100)+'%';
-      if(left<=3&&!box.classList.contains('low')){box.classList.add('low')}
+      if(left<=3)box.classList.add('low');
       if(left<=3&&Math.abs(left-Math.round(left))<.05)AU.tick();
       if(left<=0){stopCd();let i=opts.findIndex(o=>resolveOp(o,vk).t==='c');if(i<0)i=opts.findIndex(o=>resolveOp(o,vk).t==='o');if(i<0)i=opts.length-1;go(i,true)}},100)}
 }
@@ -712,7 +807,8 @@ function choose(c,vk,op,btn,after,enc,timeout){
   document.querySelectorAll('#modal .opt').forEach(b=>b.disabled=true);btn.classList.add('picked');btn.disabled=false;
   const x=resolveOp(op,vk),ty=TYPE[x.t],tr=x.tr!=null?x.tr:ty.tr;
   const env=envAdjust(x.t,x.d!=null?x.d:ty.d,enc),d=env.d;
-  changeTemp(d);S.tr[c.who]=trust(c.who)+tr;if(x.f){S.flags[x.f]=1;if(x.f==='miHelped')S.tr.mi=Math.max(trust('mi'),2)}
+  changeTemp(d);S.tr[c.who]=trust(c.who)+tr;
+  if(x.f)S.flags[x.f]=1;if(x.trMin!=null)S.tr[c.who]=Math.max(trust(c.who),x.trMin);
   if(x.t==='w')S.deeds[c.who]=c.ti;
   if(x.by)S.by++;
   if(timeout)S.timeouts++;
@@ -720,12 +816,11 @@ function choose(c,vk,op,btn,after,enc,timeout){
   if(cost){spend(cost);if(x.t==='w'||x.t==='o')S.helpMin+=cost}
   S.log.push({t:S.t,ti:c.ti,who:c.who,l:x.l,ty:x.t,to:timeout,d,env:env.k});S.hist.push({ti:c.ti,ty:x.t,temp:S.temp});
   if(enc){enc.state='done';if(x.t==='w'){enc.heart=3;for(let k=0;k<5;k++)S.fx.push({x:enc.x+(R()-.5),y:enc.y-.4-R()*.5,life:1.3+R()*.6})}}
-  // 校園夠溫暖時，你走過去，別人會停下來
   let ripple='';
-  if(enc&&x.t==='c'&&S.temp>=65){let best=null,bd=1e9;NPCS.forEach(n=>{const dd=Math.hypot(n.x-enc.x,n.y-enc.y);if(dd<bd){bd=dd;best=n}});if(best){best.goto=enc;S.others.push({who:c.who,ti:c.ti});ripple=`你走過去之後，有一個同學停下來陪${PPL[c.who].n}。`}}
+  if(enc&&x.t==='c'&&S.temp>=GAME.warmLine){let best=null,bd=1e9;NPCS.forEach(n=>{const dd=Math.hypot(n.x-enc.x,n.y-enc.y);if(dd<bd){bd=dd;best=n}});if(best){best.goto=enc;S.others.push({who:c.who,ti:c.ti});ripple=`你走過去之後，有一個人停下來陪${PPL[c.who].n}。`}}
   AU.click();
   $('res').innerHTML=`<div class="res fade-in">${timeout?'<p class="why" style="color:var(--brick)">時間到了，你還在想，事情就這樣過去了。</p>':''}<p class="narr">${esc(x.r)}${env.note?' '+esc(env.note):''}</p>${ripple?`<p class="why">${esc(ripple)}</p>`:''}
-    ${cost?`<div class="tagrow"><span class="delta time">下課時間 −${cost} 分鐘</span></div>`:''}<button class="next" id="next">繼續</button></div>`;
+    ${cost?`<div class="tagrow"><span class="delta time">${esc(PHASES[S.ph].n)}時間 −${cost} 分鐘</span></div>`:''}<button class="next" id="next">繼續</button></div>`;
   $('next').onclick=()=>closeModal(after);
   $('next').focus({preventScroll:true});
   try{$('res').scrollIntoView({behavior:'smooth',block:'nearest'})}catch(e){}
@@ -735,9 +830,9 @@ function openNeed(id,after){
   N.helpers.forEach(h=>{if(trust(h)>best){best=trust(h);who=h}});
   let body,why,d;
   if(who){const p=PPL[who];body=`${p.r}${p.n}${(N.special&&N.special[who])||N.help}`;why=S.deeds[who]?`今天在〈${S.deeds[who]}〉，你也這樣對待過${p.n}。`:`${p.n}記得你今天對他的好。`;d=2}
-  else if(S.temp>=60){body=`隔壁的同學${N.help}`;why='今天的校園裡，大家比較願意伸出手。';d=2}
+  else if(S.temp>=GAME.needWarm){body=`${N.stranger||'旁邊的人'}${N.help}`;why='今天，大家比較願意伸出手。';d=2}
   else{body=N.none;why='今天，大家好像都在忙自己的事。';d=-2}
-  S.needs.push({ti:N.ti,who,ok:!!(who||S.temp>=60),body,d});
+  S.needs.push({ti:N.ti,who,ok:!!(who||S.temp>=GAME.needWarm),body,d});
   showModal(`<section class="note fade-in"><div class="tape"></div>
     <div class="note-head"><span class="who" style="color:var(--brick)">換你需要幫忙了</span><span>${fmt(S.t)}</span>${VO.ok?'<button class="speak" id="speakBtn">朗讀</button>':''}</div>
     <h2>${esc(N.ti)}</h2><p class="narr">${esc(N.tx)}</p>
@@ -748,12 +843,6 @@ function openNeed(id,after){
 }
 
 /* ================= 繪圖 ================= */
-const PAL={
- warm:{floor:'#e9ddcb',speck:['#cdbfa9','#f4ede1','#b8a78d'],grass:['#7db25a','#87bb63'],wall:'#7a6252',wallTop:'#93796a',court:'#c97d5b',line:'#f8f1e4',track:'#c4643f',tree:['#3f7a46','#58995d'],win:'#bfe3f2',
-   rooms:{low:'#f3c58f',cls:'#eaaa6c',six:'#dc9a6c',lib:'#b8cf8c',nur:'#f2e8dd',off:'#cdb5d8',shop:'#f0c766'}},
- cold:{floor:'#cbd2d8',speck:['#b3bcc4','#e0e5e9','#9aa4ad'],grass:['#8ea29e','#97aaa6'],wall:'#535d68',wallTop:'#66717c',court:'#8a8f99',line:'#e3e8ec',track:'#8a7e86',tree:['#4d6662','#5e7974'],win:'#d6dde3',
-   rooms:{low:'#adb8c5',cls:'#a3aebc',six:'#99a4b3',lib:'#a6b6b2',nur:'#d4dadf',off:'#a8a4bc',shop:'#b4b6a7'}}
-};
 function hash(x,y){let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return ((h^(h>>16))>>>0)/4294967295}
 function buildStatic(pal){
   const sc=2,c=document.createElement('canvas');c.width=MW*TS*sc;c.height=MH*TS*sc;const g=c.getContext('2d');g.scale(sc,sc);
@@ -762,53 +851,66 @@ function buildStatic(pal){
     else if(v===6){g.fillStyle=pal.court;g.fillRect(px,py,TS,TS)}
     else{g.fillStyle=pal.floor;g.fillRect(px,py,TS,TS);for(let k=0;k<8;k++){const h=hash(x*7+k,y*13+k),h2=hash(y*5+k,x*11+k);g.fillStyle=pal.speck[k%3];g.fillRect(px+h*TS,py+h2*TS,2,2)}
       g.strokeStyle='rgba(110,100,90,.16)';g.strokeRect(px+.5,py+.5,TS-1,TS-1)}}
-  const fx=(FIELD.x+FIELD.w/2)*TS,fy=(FIELD.y+FIELD.h/2)*TS;
-  g.save();g.beginPath();g.ellipse(fx,fy,6*TS,5*TS,0,0,Math.PI*2);g.lineWidth=TS*1.4;g.strokeStyle=pal.track;g.stroke();
-  g.lineWidth=1.5;g.strokeStyle='rgba(255,255,255,.75)';[-.35,0,.35].forEach(o=>{g.beginPath();g.ellipse(fx,fy,(6+o)*TS,(5+o)*TS,0,0,Math.PI*2);g.stroke()});
-  g.fillStyle='rgba(255,255,255,.3)';g.font='40px "Huninn","Noto Sans TC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('操場',fx,fy);g.restore();
-  g.save();g.strokeStyle=pal.line;g.lineWidth=2;const cx=COURT.x*TS,cy=COURT.y*TS,cw=COURT.w*TS,ch=COURT.h*TS;
-  g.strokeRect(cx+6,cy+6,cw-12,ch-12);g.beginPath();g.moveTo(cx+cw/2,cy+6);g.lineTo(cx+cw/2,cy+ch-6);g.stroke();g.beginPath();g.arc(cx+cw/2,cy+ch/2,26,0,Math.PI*2);g.stroke();
-  g.beginPath();g.arc(cx+6,cy+ch/2,50,-Math.PI/2,Math.PI/2);g.stroke();g.beginPath();g.arc(cx+cw-6,cy+ch/2,50,Math.PI/2,Math.PI*1.5);g.stroke();
-  g.fillStyle='rgba(255,255,255,.4)';g.font='15px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText('籃球場',cx+cw/2,cy+18);g.restore();
-  g.fillStyle='rgba(255,255,255,.45)';g.font='13px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText('花圃',(GARDEN.x+GARDEN.w/2)*TS,(GARDEN.y+.6)*TS);
+  AREAS.forEach(a=>{const cx=(a.x+a.w/2)*TS,cy=(a.y+a.h/2)*TS;
+    if(a.kind==='field'){const rx=(a.w/2-1.5)*TS,ry=(a.h/2-1.5)*TS;
+      g.save();g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);g.lineWidth=TS*1.4;g.strokeStyle=pal.track;g.stroke();
+      g.lineWidth=1.5;g.strokeStyle='rgba(255,255,255,.75)';[-.35,0,.35].forEach(o=>{g.beginPath();g.ellipse(cx,cy,rx+o*TS,ry+o*TS,0,0,Math.PI*2);g.stroke()});
+      g.fillStyle='rgba(255,255,255,.3)';g.font='40px "Huninn","Noto Sans TC",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(a.n,cx,cy);g.restore()}
+    else if(a.kind==='court'){const x=a.x*TS,y=a.y*TS,w=a.w*TS,h=a.h*TS;
+      g.save();g.strokeStyle=pal.line;g.lineWidth=2;g.strokeRect(x+6,y+6,w-12,h-12);g.beginPath();g.moveTo(x+w/2,y+6);g.lineTo(x+w/2,y+h-6);g.stroke();g.beginPath();g.arc(cx,cy,26,0,Math.PI*2);g.stroke();
+      g.beginPath();g.arc(x+6,cy,50,-Math.PI/2,Math.PI/2);g.stroke();g.beginPath();g.arc(x+w-6,cy,50,Math.PI/2,Math.PI*1.5);g.stroke();
+      g.fillStyle='rgba(255,255,255,.4)';g.font='15px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText(a.n,cx,y+18);g.restore()}
+    else{g.fillStyle='rgba(255,255,255,.45)';g.font='13px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText(a.n,cx,(a.y+.6)*TS)}});
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(grid[y][x]===1&&(x===0||y===0||x===MW-1||y===MH-1)){g.fillStyle=pal.wall;g.fillRect(x*TS,y*TS,TS,TS);g.fillStyle=pal.wallTop;g.fillRect(x*TS,y*TS,TS,6)}}
   g.fillStyle=pal.floor;g.fillRect((GATE.x-1)*TS,(MH-1)*TS,2*TS,TS);
   g.fillStyle=pal.wall;g.fillRect((GATE.x-1)*TS-6,(MH-1)*TS-8,10,TS+8);g.fillRect((GATE.x+1)*TS-4,(MH-1)*TS-8,10,TS+8);
   g.strokeStyle=pal.wall;g.lineWidth=3;for(let i=0;i<8;i++){const xx=(GATE.x-1)*TS+6+i*7.5;g.beginPath();g.moveTo(xx,(MH-1)*TS+4);g.lineTo(xx,MH*TS-2);g.stroke()}
-  g.fillStyle='#fff';g.font='700 11px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText('校門',GATE.x*TS,(MH-1)*TS-12);
+  g.fillStyle='#fff';g.font='700 11px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText(GATE.label||GATE.n,GATE.x*TS,(MH-1)*TS-12);
   TREES.forEach(([x,y])=>{const cx=x*TS+TS/2,cy=y*TS+TS/2;g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(cx+3,cy+10,13,6,0,0,7);g.fill();
     g.fillStyle=pal.tree[0];g.beginPath();g.arc(cx,cy,14,0,7);g.fill();g.fillStyle=pal.tree[1];g.beginPath();g.arc(cx-4,cy-4,9,0,7);g.fill()});
-  ROOMS.forEach(r=>{const x=r.x*TS,y=r.y*TS,w=r.w*TS,h=r.h*TS;
-    g.fillStyle='rgba(0,0,0,.22)';g.fillRect(x+4,y+6,w,h);g.fillStyle=pal.rooms[r.id];g.fillRect(x,y,w,h);
-    g.strokeStyle='rgba(40,30,20,.5)';g.lineWidth=2;g.strokeRect(x+1,y+1,w-2,h-2);
-    g.strokeStyle='rgba(0,0,0,.07)';g.lineWidth=1;for(let yy=y+8;yy<y+h;yy+=8){g.beginPath();g.moveTo(x+2,yy);g.lineTo(x+w-2,yy);g.stroke()}
-    const wy=r.out>0?y+h-12:y+4;g.fillStyle=pal.win;for(let xx=x+8;xx<x+w-14;xx+=22){if(Math.abs(xx+6-(r.dx*TS+TS/2))<18)continue;g.fillRect(xx,wy,12,8)}
-    const dx=r.dx*TS,dy=r.dy*TS;g.fillStyle='#7a4e2c';g.fillRect(dx+5,dy+(r.out>0?8:0),TS-10,TS-8);g.fillStyle='#e8c35a';g.fillRect(dx+TS-11,dy+16,3,3);
-    g.font='700 13px "Noto Sans TC",sans-serif';const tw=g.measureText(r.n).width,sx=x+w/2,sy=y+h/2-4,bw=tw+14;
-    g.fillStyle='rgba(251,250,246,.92)';g.fillRect(sx-bw/2,sy-11,bw,22);g.strokeStyle='#24292c';g.lineWidth=1.5;g.strokeRect(sx-bw/2,sy-11,bw,22);
-    g.fillStyle='#24292c';g.textAlign='center';g.textBaseline='middle';g.fillText(r.n,sx,sy)});
+  PROPS.forEach(p=>{if(p.kind!=='flag')return;const cx=p.x*TS+TS/2,cy=p.y*TS+TS/2;
+    g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.ellipse(cx+2,cy+6,20,10,0,0,7);g.fill();
+    g.fillStyle='#e7e1d6';g.beginPath();g.ellipse(cx,cy+3,18,9,0,0,7);g.fill();g.strokeStyle='rgba(60,50,40,.35)';g.lineWidth=1.5;g.stroke();
+    g.strokeStyle='#6b6f75';g.lineWidth=3;g.beginPath();g.moveTo(cx,cy+3);g.lineTo(cx,cy-38);g.stroke();
+    g.fillStyle=pal.flag||'#e0533d';g.beginPath();g.moveTo(cx+1,cy-38);g.lineTo(cx+22,cy-32);g.lineTo(cx+1,cy-26);g.closePath();g.fill();
+    g.fillStyle='#fff';g.font='700 11px "Noto Sans TC",sans-serif';g.textAlign='center';g.fillText('升旗台',cx,cy+24)});
+  ROOMS.forEach(r=>{const x=r.x*TS,y=r.y*TS,w=r.w*TS,h=r.h*TS,col=(pal.rooms||{})[r.id]||pal.roomDefault||'#d9c6a8';
+    g.fillStyle='rgba(0,0,0,.2)';g.fillRect(x+5,y+7,w,h);
+    g.fillStyle=col;g.fillRect(x,y,w,h);
+    const horiz=w>=h;g.strokeStyle='rgba(0,0,0,.09)';g.lineWidth=1;
+    if(horiz){for(let yy=y+6;yy<y+h;yy+=6){g.beginPath();g.moveTo(x+3,yy);g.lineTo(x+w-3,yy);g.stroke()}}
+    else{for(let xx=x+6;xx<x+w;xx+=6){g.beginPath();g.moveTo(xx,y+3);g.lineTo(xx,y+h-3);g.stroke()}}
+    g.fillStyle='rgba(0,0,0,.14)';if(horiz)g.fillRect(x+4,y+h/2-2,w-8,4);else g.fillRect(x+w/2-2,y+4,4,h-8);
+    g.strokeStyle='rgba(50,35,25,.55)';g.lineWidth=3;g.strokeRect(x+1.5,y+1.5,w-3,h-3);
+    const dx=r.dx*TS,dy=r.dy*TS;g.fillStyle='#6a4630';
+    if(r.face==='down')g.fillRect(dx+5,dy+TS-7,TS-10,7);else if(r.face==='up')g.fillRect(dx+5,dy,TS-10,7);
+    else if(r.face==='left')g.fillRect(dx,dy+5,7,TS-10);else g.fillRect(dx+TS-7,dy+5,7,TS-10);
+    g.font='700 13px "Noto Sans TC",sans-serif';const tw=g.measureText(r.n).width,bw=tw+16,sx=x+w/2,sy=y+h/2;
+    g.fillStyle='rgba(31,42,68,.86)';g.beginPath();if(g.roundRect)g.roundRect(sx-bw/2,sy-11,bw,22,11);else g.rect(sx-bw/2,sy-11,bw,22);g.fill();
+    g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.fillText(r.n,sx,sy+.5)});
   return c;
 }
-function rebuildStatic(){staticW=buildStatic(PAL.warm);staticC=buildStatic(PAL.cold)}
+function rebuildStatic(){staticW=buildStatic(GAME.palette.warm);staticC=buildStatic(GAME.palette.cold)}
 function heart(g,x,y,s,a){g.save();g.globalAlpha=a;g.fillStyle='#e0533d';g.translate(x,y);g.scale(s,s);g.beginPath();g.moveTo(0,3);g.bezierCurveTo(-6,-2,-3,-7,0,-4);g.bezierCurveTo(3,-7,6,-2,0,3);g.fill();g.restore()}
 function drawPerson(g,x,y,o){
-  const bob=o.moving?Math.sin(o.walk*2.2)*1.6:0,sc=o.small?.8:o.big?1.12:1;
+  const bob=o.moving?Math.sin(o.walk*2.2)*1.4:0,sc=o.small?.8:o.big?1.12:1,lp=o.moving?Math.sin(o.walk*2.2)*2.5:0;
   g.save();g.translate(x,y);g.scale(sc,sc);
-  g.fillStyle='rgba(0,0,0,.22)';g.beginPath();g.ellipse(0,11,9,4,0,0,7);g.fill();
-  const lp=o.moving?Math.sin(o.walk*2.2)*3:0;g.fillStyle=o.pants;g.fillRect(-5,3+bob,4,8+lp*.3);g.fillRect(1,3+bob,4,8-lp*.3);
-  g.fillStyle=o.shirt;g.fillRect(-7,-6+bob,14,11);
-  if(o.bag){g.fillStyle=o.bag;g.fillRect(-8,-5+bob,4,9)}
-  if(o.tag){g.fillStyle=o.tag;g.fillRect(2,-4+bob,4,3)}
-  g.fillStyle='#f0c9a2';g.beginPath();g.arc(0,-12+bob,7,0,7);g.fill();
-  g.fillStyle=o.hair;g.beginPath();g.arc(0,-14+bob,7,Math.PI,0);g.fill();
-  if((o.fy||0)>=0){g.fillStyle='#222';g.fillRect(-3+(o.fx||0)*2,-12+bob,2,2);g.fillRect(2+(o.fx||0)*2,-12+bob,2,2)}
+  g.fillStyle='rgba(0,0,0,.2)';g.beginPath();g.ellipse(0,11,9,3.5,0,0,7);g.fill();
+  g.fillStyle=o.pants;g.beginPath();g.ellipse(-3.2,8+lp*.3,2.6,3.6,0,0,7);g.fill();g.beginPath();g.ellipse(3.2,8-lp*.3,2.6,3.6,0,0,7);g.fill();
+  if(o.bag){g.fillStyle=o.bag;g.beginPath();g.ellipse(-6.5,-1+bob,3.5,5.5,0,0,7);g.fill()}
+  g.fillStyle=o.shirt;g.strokeStyle='rgba(31,42,68,.35)';g.lineWidth=1;g.beginPath();g.ellipse(0,0+bob,7.5,7.5,0,0,7);g.fill();g.stroke();
+  if(o.tag){g.fillStyle=o.tag;g.beginPath();g.arc(3,-1+bob,2,0,7);g.fill()}
+  g.fillStyle='#f3cfaa';g.beginPath();g.arc(0,-11+bob,7.5,0,7);g.fill();
+  g.fillStyle=o.hair;g.beginPath();g.arc(0,-12.5+bob,7.6,Math.PI*1.02,Math.PI*1.98);g.fill();
+  if((o.fy||0)>=0){g.fillStyle='#2a2a2a';g.beginPath();g.arc(-2.6+(o.fx||0)*2,-10.5+bob,1.1,0,7);g.arc(2.6+(o.fx||0)*2,-10.5+bob,1.1,0,7);g.fill();
+    g.fillStyle='rgba(230,120,110,.45)';g.beginPath();g.arc(-4.5,-8+bob,1.4,0,7);g.arc(4.5,-8+bob,1.4,0,7);g.fill()}
   g.restore();
-  if(o.label){g.font='700 10px "Noto Sans TC",sans-serif';g.textAlign='center';g.textBaseline='middle';const tw=g.measureText(o.label).width+8;g.fillStyle=o.labelBg||'rgba(36,41,44,.85)';g.fillRect(x-tw/2,y-36+bob,tw,14);g.fillStyle='#fff';g.fillText(o.label,x,y-29+bob)}
-  if(o.dots){g.fillStyle='rgba(255,255,255,.85)';g.strokeStyle='rgba(36,41,44,.5)';g.lineWidth=1;g.beginPath();g.ellipse(x+11,y-26,10,7,0,0,7);g.fill();g.stroke();g.fillStyle='#55606a';[-4,0,4].forEach(d=>g.fillRect(x+10+d,y-26,2,2))}
+  if(o.label){g.font='700 10px "Noto Sans TC",sans-serif';g.textAlign='center';g.textBaseline='middle';const tw=g.measureText(o.label).width+10;g.fillStyle=o.labelBg||'rgba(31,42,68,.85)';g.beginPath();if(g.roundRect)g.roundRect(x-tw/2,y-36+bob,tw,14,7);else g.rect(x-tw/2,y-36+bob,tw,14);g.fill();g.fillStyle='#fff';g.fillText(o.label,x,y-28.5+bob)}
+  if(o.dots){g.fillStyle='rgba(255,255,255,.9)';g.strokeStyle='rgba(31,42,68,.4)';g.lineWidth=1;g.beginPath();g.ellipse(x+11,y-26,10,7,0,0,7);g.fill();g.stroke();g.fillStyle='#5d6965';[-4,0,4].forEach(d=>{g.beginPath();g.arc(x+11+d,y-26,1.1,0,7);g.fill()})}
 }
 function draw(){
   const cv=$('cv');if(!cv)return;const g=cv.getContext('2d');
-  g.setTransform(1,0,0,1,0,0);g.fillStyle='#2d3833';g.fillRect(0,0,cv.width,cv.height);
+  g.setTransform(1,0,0,1,0,0);g.fillStyle='#b7c3c9';g.fillRect(0,0,cv.width,cv.height);
   if(!staticW||!S||!P||S.ph<0)return;
   S.shown+=(S.temp-S.shown)*.04;const warm=clamp(S.shown/100,0,1),wa=warm*warm*(3-2*warm);
   const vw=cvW/zoom,vh=cvH/zoom,WW=MW*TS,WH=MH*TS;
@@ -818,18 +920,18 @@ function draw(){
   g.drawImage(staticC,0,0,WW,WH);g.globalAlpha=wa;g.drawImage(staticW,0,0,WW,WH);g.globalAlpha=1;
   const now=performance.now()/1000,pulse=.55+.45*Math.sin(now*5);
   if(S.dest&&!S.arrived){
-    g.strokeStyle=`rgba(255,214,90,${pulse})`;g.lineWidth=4;
-    if(S.dest==='fld'){g.setLineDash([10,8]);g.strokeRect(FIELD.x*TS,FIELD.y*TS,FIELD.w*TS,FIELD.h*TS);g.setLineDash([])}
-    else if(S.dest==='court'){g.setLineDash([10,8]);g.strokeRect(COURT.x*TS,COURT.y*TS,COURT.w*TS,COURT.h*TS);g.setLineDash([])}
-    else if(S.dest==='gate'){g.beginPath();g.arc(GATE.x*TS,GATE.y*TS,TS*1.3,0,7);g.stroke()}
-    else{const r=roomById(S.dest);g.strokeRect(r.dx*TS+2,r.dy*TS+(r.out>0?4:-4),TS-4,TS);
-      g.fillStyle='#ffd23f';g.beginPath();const bx=r.dx*TS+TS/2,by=r.dy*TS+(r.out>0?TS+18:-16)+Math.sin(now*6)*3;g.moveTo(bx,by-(r.out>0?-10:10));g.lineTo(bx-8,by);g.lineTo(bx+8,by);g.closePath();g.fill()}}
+    g.strokeStyle=`rgba(255,214,90,${pulse})`;g.lineWidth=4;const a=areaById(S.dest);
+    if(a){g.setLineDash([10,8]);g.strokeRect(a.x*TS,a.y*TS,a.w*TS,a.h*TS);g.setLineDash([])}
+    else if(S.dest===GATE.id){g.beginPath();g.arc(GATE.x*TS,GATE.y*TS,TS*1.3,0,7);g.stroke()}
+    else{const r=roomById(S.dest),cx=r.dx*TS+TS/2,cy=r.dy*TS+TS/2;g.strokeRect(r.dx*TS+2+r.fx*TS*.5,r.dy*TS+2+r.fy*TS*.5,TS-4,TS-4);
+      const bob=Math.sin(now*6)*3,ax=cx+r.fx*(TS*1.3+bob),ay=cy+r.fy*(TS*1.3+bob);
+      g.save();g.translate(ax,ay);g.rotate(Math.atan2(-r.fy,-r.fx));g.fillStyle='#ffd23f';g.strokeStyle='#1f2a44';g.lineWidth=1.5;g.beginPath();g.moveTo(10,0);g.lineTo(-6,-8);g.lineTo(-6,8);g.closePath();g.fill();g.stroke();g.restore()}}
   const ents=[{k:'p',y:P.y}].concat(NPCS.map(n=>({k:'n',n,y:n.y})),S.enc?[{k:'e',y:S.enc.y}]:[]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
     if(e.k==='p')return drawPerson(g,P.x*TS,P.y*TS,{moving:P.moving,walk:walkT*2,shirt:'#f6f3ea',pants:'#2c3a66',hair:'#2a211c',tag:'#c8553d',fx:P.fx,fy:P.fy,label:'你',labelBg:'#c8553d'});
     if(e.k==='n'){const n=e.n;return drawPerson(g,n.x*TS,n.y*TS,{moving:n.moving,walk:n.walk,shirt:'#f4f4f0',pants:'#2c3a66',hair:'#1b1b1b',bag:n.bag,fx:n.fx||0,fy:n.fy||1,dots:n.bub>0})}
     const s=S.enc,p=PPL[s.who];
-    drawPerson(g,s.x*TS,s.y*TS,{moving:0,walk:0,shirt:p.c,pants:'#3b3a44',hair:s.who==='lin'?'#4a3a30':'#1b1b1b',small:s.who==='mi'||s.who==='dou',big:s.who==='lin',fx:0,fy:1,label:p.n,labelBg:p.c});
+    drawPerson(g,s.x*TS,s.y*TS,{moving:0,walk:0,shirt:p.c,pants:'#3b3a44',hair:p.big?'#4a3a30':'#1b1b1b',small:p.small,big:p.big,fx:0,fy:1,label:p.n,labelBg:p.c});
     if(s.heart>0)heart(g,s.x*TS+12,s.y*TS-30-(3-s.heart)*6,1.6,Math.min(1,s.heart));
   });
   S.fx.forEach(f=>heart(g,f.x*TS,f.y*TS,1.3,Math.min(1,f.life)));
@@ -843,15 +945,13 @@ function draw(){
   if(S.dest&&!S.arrived){const d=destPoint(),gx=(d.x*TS-camX)*zoom,gy=(d.y*TS-camY)*zoom;
     if(gx<0||gx>cvW||gy<0||gy>cvH){const px=(P.x*TS-camX)*zoom,py=(P.y*TS-camY)*zoom,a=Math.atan2(gy-py,gx-px);
       const ax=clamp(px+Math.cos(a)*Math.min(cvW,cvH)*.38,26,cvW-26),ay=clamp(py+Math.sin(a)*Math.min(cvW,cvH)*.38,26,cvH-26);
-      g.save();g.translate(ax,ay);g.rotate(a);g.fillStyle='#ffd23f';g.strokeStyle='#24292c';g.lineWidth=2;g.beginPath();g.moveTo(18,0);g.lineTo(-11,-12);g.lineTo(-5,0);g.lineTo(-11,12);g.closePath();g.fill();g.stroke();g.restore()}}
-  const ms=Math.min(3,Math.max(2,cvW/150)),mw=MW*ms,mh=MH*ms,mx=cvW-mw-8,my=8;
-  g.fillStyle='rgba(20,26,23,.72)';g.fillRect(mx-3,my-3,mw+6,mh+6);
-  g.fillStyle=wa>.5?'#7da85d':'#8ea29e';g.fillRect(mx+FIELD.x*ms,my+FIELD.y*ms,FIELD.w*ms,FIELD.h*ms);g.fillRect(mx+GARDEN.x*ms,my+GARDEN.y*ms,GARDEN.w*ms,GARDEN.h*ms);
-  g.fillStyle=(S.dest==='court'&&!S.arrived&&pulse>.5)?'#ffd23f':'#a37b63';g.fillRect(mx+COURT.x*ms,my+COURT.y*ms,COURT.w*ms,COURT.h*ms);
-  ROOMS.forEach(r=>{g.fillStyle=(S.dest===r.id&&!S.arrived&&pulse>.5)?'#ffd23f':(wa>.5?PAL.warm:PAL.cold).rooms[r.id];g.fillRect(mx+r.x*ms,my+r.y*ms,r.w*ms,r.h*ms)});
-  if(S.dest==='fld'&&!S.arrived&&pulse>.5){g.strokeStyle='#ffd23f';g.lineWidth=2;g.strokeRect(mx+FIELD.x*ms,my+FIELD.y*ms,FIELD.w*ms,FIELD.h*ms)}
-  if(S.dest==='gate'&&!S.arrived&&pulse>.5){g.fillStyle='#ffd23f';g.fillRect(mx+(GATE.x-1)*ms,my+(MH-1)*ms,2*ms,ms)}
-  NPCS.forEach(n=>{g.fillStyle='#fff';g.fillRect(mx+n.x*ms-1,my+n.y*ms-1,2,2)});
+      g.save();g.translate(ax,ay);g.rotate(a);g.fillStyle='#ffd23f';g.strokeStyle='#1f2a44';g.lineWidth=2;g.beginPath();g.moveTo(18,0);g.lineTo(-11,-12);g.lineTo(-5,0);g.lineTo(-11,12);g.closePath();g.fill();g.stroke();g.restore()}}
+  const ms=Math.min(3,Math.max(2,cvW/150)),mw=MW*ms,mh=MH*ms,mx=cvW-mw-8,my=8,pal=wa>.5?GAME.palette.warm:GAME.palette.cold;
+  g.fillStyle='rgba(251,250,246,.88)';g.fillRect(mx-3,my-3,mw+6,mh+6);g.strokeStyle='rgba(31,42,68,.3)';g.lineWidth=1;g.strokeRect(mx-3,my-3,mw+6,mh+6);
+  AREAS.forEach(a=>{g.fillStyle=(S.dest===a.id&&!S.arrived&&pulse>.5)?'#ffd23f':a.kind==='court'?pal.court:pal.grass[0];g.fillRect(mx+a.x*ms,my+a.y*ms,a.w*ms,a.h*ms)});
+  ROOMS.forEach(r=>{g.fillStyle=(S.dest===r.id&&!S.arrived&&pulse>.5)?'#ffd23f':((pal.rooms||{})[r.id]||'#d9c6a8');g.fillRect(mx+r.x*ms,my+r.y*ms,r.w*ms,r.h*ms)});
+  if(S.dest===GATE.id&&!S.arrived&&pulse>.5){g.fillStyle='#ffd23f';g.fillRect(mx+(GATE.x-1)*ms,my+(MH-1)*ms,2*ms,ms)}
+  NPCS.forEach(n=>{g.fillStyle='#5d6965';g.fillRect(mx+n.x*ms-1,my+n.y*ms-1,2,2)});
   g.fillStyle='#ff6b4a';g.beginPath();g.arc(mx+P.x*ms,my+P.y*ms,3,0,7);g.fill();
   if(joy){g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=2;g.beginPath();g.arc(joy.ox,joy.oy,42,0,7);g.stroke();
     const jx=joy.x-joy.ox,jy=joy.y-joy.oy,L=Math.hypot(jx,jy),k=L>42?42/L:1;g.fillStyle='rgba(255,255,255,.65)';g.beginPath();g.arc(joy.ox+jx*k,joy.oy+jy*k,16,0,7);g.fill()}
@@ -864,31 +964,28 @@ function frame(ts){if(!running)return;const dt=Math.min(.05,(ts-last)/1000||0);l
 /* ================= 開始、結算 ================= */
 function renderStart(){
   running=false;AU.bgmStop();VO.stop();$('game').hidden=true;$('end').hidden=true;$('start').hidden=false;
+  document.title=GAME.title;const tp=GAME.titleParts||[GAME.title,'',''];
   $('start').innerHTML=`<section class="hero">
     <div style="min-width:0">
-      <div class="eyebrow">一天・八個時段・沒有標準答案</div>
-      <h1 class="title">校園<span>溫度</span>計</h1>
-      <p class="ask">今天，校園會是幾度？</p>
-      <p class="lede">你是五年三班的學生，今天有 5 件自己的事要做完。一路上，你會遇到同學、老師、學長姊和學弟妹。早上的校園是 40°，你怎麼對待他們，溫度就會悄悄改變，放學時才會揭曉。</p>
+      <div class="eyebrow">${esc(GAME.eyebrow)}</div>
+      <h1 class="title">${esc(tp[0])}<span>${esc(tp[1])}</span>${esc(tp[2])}</h1>
+      <p class="ask">${esc(GAME.ask)}</p>
+      <p class="lede">${esc(GAME.lede)}</p>
     </div>
-    <div class="bigthermo" aria-hidden="true"><div class="tube"><i></i></div><div class="ticks">
-      <span><b>100°</b></span><span><b>75°</b>暖洋洋</span><span><b>50°</b>有陽光</span><span><b>25°</b>陰天</span><span><b>0°</b>結冰</span></div><div class="bulb"></div></div>
+    <div class="bigthermo" aria-hidden="true"><div class="tube"><i style="--h:${GAME.startTemp}%"></i></div><div class="ticks">
+      <span><b>100°</b></span>${GAME.tiers.map(t=>`<span><b>${t.min}°</b>${esc(t.n.replace(/的.*$/,''))}</span>`).join('')}</div><div class="bulb"></div></div>
   </section>
-  <div class="how">
-    <div><b>走路</b>手指在畫面上拖曳，或用鍵盤方向鍵。</div>
-    <div><b>自己的事</b>5 件事分散在兩次下課，每次只有 10 分鐘。停下來幫人，自己的事可能就做不完。</div>
-    <div><b>紙條有倒數</b>${CD_SECS>0?`${CD_SECS} 秒內沒做決定，就當作你走過去了。`:'這一輪沒有倒數，可以慢慢想。'}</div>
-  </div>
-  <div class="cast"><h3>今天會遇到的人</h3><div class="people">${['zhe','jiaen','yu','mi','dou','yx','py','lin'].map(k=>`<span><i style="background:${PPL[k].c}"></i>${PPL[k].r}・${PPL[k].n}</span>`).join('')}</div></div>
+  <div class="how">${GAME.how.map(([b,t])=>`<div><b>${esc(b)}</b>${esc(CD_SECS>0?t.replace('{cd}',CD_SECS):(t.includes('{cd}')?'這一輪沒有倒數，可以慢慢想。':t))}</div>`).join('')}</div>
+  <div class="cast"><h3>今天會遇到的人</h3><div class="people">${GAME.cast.map(k=>`<span><i style="background:${PPL[k].c}"></i>${esc(PPL[k].r)}・${esc(PPL[k].n)}</span>`).join('')}</div></div>
   <div class="selfq"><h3>開始前，先想一想</h3>
-    <p>在學校看到有人需要幫忙，你通常會怎麼做？</p>
-    <div class="opts">${Object.entries(SELF).map(([k,v],i)=>`<button class="opt" data-k="${k}"><span class="k">${'ABC'[i]}</span><span class="t">${esc(v)}</span></button>`).join('')}</div>
-    <small>選好就會走進校門，時間是 07:40。</small></div>
+    <p>${esc(GAME.selfCheck.q)}</p>
+    <div class="opts">${Object.entries(GAME.selfCheck.options).map(([k,v],i)=>`<button class="opt" data-k="${k}"><span class="k">${'ABCDE'[i]}</span><span class="t">${esc(v)}</span></button>`).join('')}</div>
+    <small>${esc(GAME.selfCheck.hint||'')}</small></div>
   <footer class="foot">
     <label for="cdSel">紙條倒數</label><select id="cdSel"><option value="0">關閉</option><option value="10">10 秒</option><option value="15">15 秒</option><option value="20">20 秒</option><option value="30">30 秒</option></select>
-    <p class="credit">遊戲背景改編自辛巴王《今天也要平安下班》</p>
+    ${GAME.credit?`<p class="credit">${esc(GAME.credit)}</p>`:''}
   </footer>`;
-  const sel=$('cdSel');sel.value=String(CD_SECS);sel.onchange=()=>{CD_SECS=+sel.value;try{localStorage.setItem('wd_cd',String(CD_SECS))}catch(e){}renderStart();const f=$('cdSel');if(f)f.focus()};
+  const sel=$('cdSel');sel.value=String(CD_SECS);sel.onchange=()=>{CD_SECS=+sel.value;store.set('cd',String(CD_SECS));renderStart();const f=$('cdSel');if(f)f.focus()};
   document.querySelectorAll('.selfq .opt').forEach(b=>b.onclick=()=>{newRun(1,b.dataset.k);startGame()});
   scrollTo(0,0);
 }
@@ -899,63 +996,57 @@ function startGame(){
   initWorld();paused=false;userPaused=false;grace=.5;resize();startPhase(0);
   if(!running){running=true;last=performance.now();requestAnimationFrame(frame)}
 }
-const TIERS=[
- {min:75,c:'t4',n:'暖洋洋的校園',d:'走廊上，大家兩兩一起走、一起笑。你沒空停下來的時候，也有別人停下來了。'},
- {min:50,c:'t3',n:'有陽光的校園',d:'今天大部分的人都被好好對待了。也有幾個人，還在等有人走過去。'},
- {min:25,c:'t2',n:'陰天的校園',d:'大家各忙各的。沒有人故意傷害誰，可是需要幫忙的人，常常等不到人。'},
- {min:0,c:'t1',n:'結冰的校園',d:'走廊上很安靜，每個人都低著頭走路。需要幫忙的人越來越多，願意停下來的人越來越少。'}
-];
 function tempChart(){
-  const pts=[{ti:'早上',ty:'s',temp:40}].concat(S.hist),W=600,H=250,L=52,Rr=16,T=14,B=30,n=pts.length;
+  const pts=[{ti:'開始',ty:'s',temp:GAME.startTemp}].concat(S.hist),W=600,H=250,L=52,Rr=16,T=14,B=30,n=pts.length;
   const X=i=>L+(W-L-Rr)*(n>1?i/(n-1):0),Y=v=>T+(H-T-B)*(1-v/100);
   const col={w:'#c8553d',m:'#8a5aa8',o:'#5a8f7b',p:'#e2a131',c:'#7d8a92',h:'#3f78a3',n:'#3c8457',s:'#24292c'};
-  const grid=[[0,'結冰'],[25,'陰天'],[50,'有陽光'],[75,'暖洋洋'],[100,'']].map(([v,lab])=>`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#24292c" stroke-opacity=".12"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="16" fill="#5d6965">${v}°</text>${lab?`<text x="${L+4}" y="${Y(v)-4}" font-size="14" fill="#5d6965">${lab}</text>`:''}`).join('');
+  const lines=[[100,'']].concat(GAME.tiers.map(t=>[t.min,t.n.replace(/的.*$/,'')]));
+  const grid=lines.map(([v,lab])=>`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#24292c" stroke-opacity=".12"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="16" fill="#5d6965">${v}°</text>${lab?`<text x="${L+4}" y="${Y(v)-4}" font-size="14" fill="#5d6965">${esc(lab)}</text>`:''}`).join('');
   const line=pts.map((p,i)=>`${i?'L':'M'}${X(i).toFixed(1)},${Y(p.temp).toFixed(1)}`).join('');
   const dots=pts.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.temp).toFixed(1)}" r="${i===0||i===n-1?5:3.6}" fill="${col[p.ty]||'#24292c'}" stroke="#fbfaf6" stroke-width="1.5"><title>${esc(p.ti)}：${p.temp}°</title></circle>`).join('');
-  return `<div style="overflow-x:auto;margin-top:10px"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:340px;height:auto;display:block" role="img" aria-label="校園溫度從早上 40 度變成 ${S.temp} 度">${grid}<path d="${line}" fill="none" stroke="#24292c" stroke-width="2"/>${dots}<text x="${L}" y="${H-8}" font-size="16" fill="#5d6965">早上 07:40</text><text x="${W-Rr}" y="${H-8}" font-size="16" fill="#5d6965" text-anchor="end">放學</text></svg></div>`;
+  return `<div style="overflow-x:auto;margin-top:10px"><svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:340px;height:auto;display:block" role="img" aria-label="溫度從 ${GAME.startTemp} 度變成 ${S.temp} 度">${grid}<path d="${line}" fill="none" stroke="#24292c" stroke-width="2"/>${dots}<text x="${L}" y="${H-8}" font-size="16" fill="#5d6965">${fmt(PHASES[0].t)}</text><text x="${W-Rr}" y="${H-8}" font-size="16" fill="#5d6965" text-anchor="end">${esc(PHASES[PHASES.length-1].n)}</text></svg></div>`;
 }
 const dlab=d=>d>0?`+${d}°`:d<0?`−${-d}°`:'±0°';
 function relWord(v){return v>=4?'很信任你':v>=2?'覺得你人不錯':v>=0?'跟你還不熟':v>=-2?'有點受傷':'很受傷'}
 function renderEnd(){
   if(S.over)return;S.over=true;running=false;stopCd();AU.bgmStop();AU.ending(S.temp/100);VO.stop();
-  $('game').hidden=true;const o=$('end');const tier=TIERS.find(t=>S.temp>=t.min);o.className='end '+tier.c;o.hidden=false;
+  $('game').hidden=true;const o=$('end');const ti=GAME.tiers.findIndex(t=>S.temp>=t.min),tier=GAME.tiers[ti];
+  o.className='end t'+(GAME.tiers.length-ti);o.hidden=false;
   const cnt={w:0,m:0,o:0,p:0,c:0,h:0};S.log.forEach(l=>cnt[l.ty]++);
   const judged=S.log.filter(l=>l.ty!=='o'),stopped=judged.filter(l=>l.ty==='w'||l.ty==='m').length,rate=judged.length?stopped/judged.length:0;
   const actual=rate>=.7?'大多數時候都停下來了':rate>=.4?'大約一半的時候停下來':'大多數時候沒有停下來';
-  const notes=[];
-  notes.push(`需要做決定的 ${judged.length} 次裡，你停下來 ${stopped} 次。`);
+  const notes=[`需要做決定的 ${judged.length} 次裡，你停下來 ${stopped} 次。`];
   if(S.by)notes.push(`有 ${S.by} 次，你覺得「應該有別人會處理」。`);
   if(S.timeouts)notes.push(`有 ${S.timeouts} 次，你還在想，時間就到了。`);
   if(cnt.m)notes.push(`有 ${cnt.m} 次你想幫忙，但沒先看清楚對方需要什麼。`);
-  const met=[...S.met];
+  const selfTxt=GAME.selfCheck.options[S.self];
   o.innerHTML=`<div class="wrap">
-    <div class="eyebrow">第 ${S.day} 天・16:20 放學</div>
-    <div class="deg"><b>${S.temp}°</b><span class="ending">${tier.n}</span></div>
+    <div class="eyebrow">第 ${S.day} 天・${esc(GAME.endEyebrow||'')}</div>
+    <div class="deg"><b>${S.temp}°</b><span class="ending">${esc(tier.n)}</span></div>
     <p class="tierline">${esc(tier.d)}</p>
     <div class="sect"><h3>今天的溫度變化</h3>
-      <p class="vsnote">早上走進校門時是 40°。你每做一個選擇，溫度都在悄悄改變，放學時是 ${S.temp}°。圖上每一個點是一張紙條，點的顏色是那次選擇的種類。</p>
+      <p class="vsnote">一開始是 ${GAME.startTemp}°。你每做一個選擇，溫度都在悄悄改變，最後是 ${S.temp}°。圖上每一個點是一張紙條，點的顏色是那次選擇的種類。</p>
       ${tempChart()}</div>
     <div class="sect"><h3>你說的，和你做的</h3>
-      <div class="vs"><div><small>開始前，你說你通常會</small><b>${esc(SELF[S.self])}</b></div><div><small>今天，你實際上</small><b>${actual}</b></div></div>
+      <div class="vs"><div><small>開始前，你說你通常會</small><b>${esc(selfTxt)}</b></div><div><small>今天，你實際上</small><b>${actual}</b></div></div>
       <p class="vsnote">${notes.map(esc).join('<br>')}</p></div>
     <div class="sect"><h3>你自己的事</h3>
       <ul class="log">${Object.entries(TASKS).map(([k,t])=>`<li><time></time><span class="c"><b>${esc(t.n)}</b>${S.task[k]===1?'':`<br><span style="color:var(--muted)">${esc(t.fail)}</span>`}</span><span class="chip ${S.task[k]===1?'n':'c'}">${S.task[k]===1?'做完了':'沒做完'}</span></li>`).join('')}</ul>
-      <p class="vsnote">今天下課，你花了 ${S.helpMin} 分鐘在別人身上。</p></div>
+      <p class="vsnote">今天，你花了 ${S.helpMin} 分鐘在別人身上。</p></div>
     <div class="sect"><h3>今天的每一張紙條</h3>
-      <ul class="log">${S.log.map(l=>`<li><time>${fmt(l.t)}</time><span class="c"><b>${esc(l.ti)}</b>：${esc(l.l)}${l.to?'<em>時間到</em>':''}${l.env?`<em style="color:var(--muted)">（${ENV_LAB[l.env]}）</em>`:''}</span><span class="chip ${l.ty}">${TYPE[l.ty].n} ${dlab(l.d)}</span></li>`).join('')}</ul></div>
+      <ul class="log">${S.log.map(l=>`<li><time>${fmt(l.t)}</time><span class="c"><b>${esc(l.ti)}</b>：${esc(l.l)}${l.to?'<em>時間到</em>':''}${l.env?`<em style="color:var(--muted)">（${esc(GAME.envText[l.env].lab)}）</em>`:''}</span><span class="chip ${l.ty}">${TYPE[l.ty].n} ${dlab(l.d)}</span></li>`).join('')}</ul></div>
     <div class="sect"><h3>換你需要幫忙的時候</h3>
       <ul class="log">${S.needs.map(n=>`<li><time></time><span class="c"><b>${esc(n.ti)}</b>：${esc(n.body)}</span><span class="chip ${n.ok?'n':'c'}">${n.ok?'有人來':'沒有人'} ${dlab(n.d)}</span></li>`).join('')}</ul></div>
-    ${S.others.length?`<div class="sect"><h3>你走過去之後</h3><ul class="plain">${S.others.map(m=>`<li>有同學停下來陪${esc(PPL[m.who].r)}${esc(PPL[m.who].n)}（${esc(m.ti)}）</li>`).join('')}</ul></div>`:''}
+    ${S.others.length?`<div class="sect"><h3>你走過去之後</h3><ul class="plain">${S.others.map(m=>`<li>有人停下來陪${esc(PPL[m.who].r)}${esc(PPL[m.who].n)}（${esc(m.ti)}）</li>`).join('')}</ul></div>`:''}
     <div class="sect"><h3>他們現在對你的感覺</h3>
-      <div class="rel">${met.map(k=>`<div><b style="color:${PPL[k].c}">${esc(PPL[k].n)}</b>${esc(PPL[k].r)}・${relWord(trust(k))}</div>`).join('')}</div></div>
+      <div class="rel">${[...S.met].map(k=>`<div><b style="color:${PPL[k].c}">${esc(PPL[k].n)}</b>${esc(PPL[k].r)}・${relWord(trust(k))}</div>`).join('')}</div></div>
     <div class="sect"><h3>六種選擇</h3><div class="legend">
-      ${['w','m','o','p','c','h'].map(k=>`<div><span class="chip ${k}" style="justify-self:start">${TYPE[k].n}</span><span>${esc(TYPE[k].why)}</span></div>`).join('')}</div>
-      <div class="bystander" style="border-left-color:var(--brick)"><b>同一個選擇，在不同溫度的校園，效果不一樣</b><br>校園暖的時候，你的善意比較容易被別人學起來，你沒停下來時也常有人補上；校園冷的時候，善意比較容易被懷疑，你走過去也不會有人補上。所以暖的地方會越來越暖，冷的地方會越來越冷。</div>
-      <div class="bystander"><b>旁觀者效應</b><br>旁邊的人越多，每個人越覺得「應該有別人會處理」。1968 年，心理學家 Darley 和 Latané 讓受試者透過對講機聽到有人發病：以為只有自己聽到時，85% 的人在對方發病期間就去求助；以為還有 4 個人也聽到時，只剩 31%。</div></div>
-    <div class="sect"><h3>想一想</h3><details><summary>課後討論題（4 題）</summary><ol>${QUESTIONS.map(q=>`<li>${esc(q.replace('{self}',SELF[S.self]))}</li>`).join('')}</ol></details></div>
-    <p class="tierline">明天的校園會是幾度，你覺得由誰決定呢？</p>
+      ${['w','m','o','p','c','h'].map(k=>`<div><span class="chip ${k}" style="justify-self:start">${esc(TYPE[k].n)}</span><span>${esc(TYPE[k].why)}</span></div>`).join('')}</div>
+      ${(GAME.endNotes||[]).map((n,i)=>`<div class="bystander"${i===0?' style="border-left-color:var(--brick)"':''}><b>${esc(n.title)}</b><br>${esc(n.text)}</div>`).join('')}</div>
+    <div class="sect"><h3>想一想</h3><details><summary>課後討論題（${GAME.questions.length} 題）</summary><ol>${GAME.questions.map(q=>`<li>${esc(q.replace('{self}',selfTxt))}</li>`).join('')}</ol></details></div>
+    ${GAME.closing?`<p class="tierline">${esc(GAME.closing)}</p>`:''}
     <div class="row"><button class="primary" id="again">再過一天</button><button class="ghost" id="home">回到開始</button></div>
-    <p class="credit" style="color:var(--muted);margin-top:22px">遊戲背景改編自辛巴王《今天也要平安下班》</p>
+    ${GAME.credit?`<p class="credit" style="color:var(--muted);margin-top:22px">${esc(GAME.credit)}</p>`:''}
   </div>`;
   $('again').onclick=()=>{newRun(S.day+1,S.self);startGame()};
   $('home').onclick=()=>renderStart();
@@ -986,6 +1077,7 @@ if(typeof document!=='undefined'&&document.getElementById('start')){
   buildWorld();rebuildStatic();bindInput();renderStart();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(rebuildStatic);
 }
+
 </script>
 
 </body>
