@@ -227,6 +227,8 @@ h1,h2,h3{margin:0;text-wrap:balance}
    類型：w 真心 / m 沒看清楚 / o 剛好 / p 做表面 / c 路過 / h 傷人
    額外設定：cost 花幾分鐘（只在下課計算）、d 改溫度、tr 改信任、f 設旗標、trMin 信任至少、by 旁觀者 */
 function C(id,who,ti,tx,ops,vars){return {id,who,ti,tx,vars,ops:ops.map(o=>Object.assign({l:o[0],t:o[1],r:o[2]},o[3]||{}))}}
+/* MC：鏡像卡。MC(編號, 人物, 標題, 敘述含{pre}, [對應第一天的卡], {第一天選的類型:對方看到的樣子}, 選項) */
+function MC(id,who,ti,tx,mirror,pre,ops){return Object.assign(C(id,who,ti,tx,ops),{mirror,pre})}
 function V(l,a,b,ex){return [l,'',' ',Object.assign({v:{A:Object.assign({t:a[0],r:a[1]},a[2]||{}),B:Object.assign({t:b[0],r:b[1]},b[2]||{})}},ex||{})]}
 
 const GAME={
@@ -258,9 +260,14 @@ people:{
   py:{n:'品妍',r:'六年級學姊',c:'#9256b0'},
   lin:{n:'林老師',r:'導師',c:'#7a6450',big:1},
   kai:{n:'阿凱',r:'四年級',c:'#6d7f88'},
-  lele:{n:'樂樂',r:'二年級學弟',c:'#c2683a',small:1}
+  lele:{n:'樂樂',r:'二年級學弟',c:'#c2683a',small:1},
+  hao:{n:'阿豪',r:'六年級學長',c:'#2f6f8f'},
+  ting:{n:'婷婷',r:'三年級學妹',c:'#d4693a',small:1},
+  nana:{n:'娜娜',r:'二年級學妹',c:'#d65a92',small:1},
+  ken:{n:'小肯',r:'四年級學弟',c:'#5b8f3a'},
+  yan:{n:'小妍',r:'四年級學妹',c:'#7a5ec2'},
+  hero:{n:'第一天的你',r:'同班同學',c:'#c8553d'}   // 「換個人過同一天」時，第一天的你會變成別人眼中的同學
 },
-cast:['zhe','jiaen','yu','mi','dou','yx','py','lin'],
 
 /* ---------- 3. 地圖：36×24 格，每格約一張桌子大 ----------
    rooms：建築物（不能走進去），dx/dy 是門的位置，out=1 門朝下、-1 門朝上
@@ -313,14 +320,17 @@ minPerSec:.6,                               // 下課時，真實 1 秒 = 幾分
    cards 寫法：'卡片編號'、{pick:[a,b]} 隨機一張、{if:{flag:'旗標'}, then:'卡', else:'卡'}、{if:{trust:['人物',2]}, then, else} */
 phases:[
   {n:'到校',t:460,end:480,dest:'cls',lim:22,cards:['jiaen_alone','zhe_hw']},
-  {n:'下課',t:530,end:540,free:true,route:['mi','teacher']},
+  {n:'下課',t:530,end:540,free:true,pool:2},
   {n:'分組課',t:540,end:580,dest:['cls','lib'],lim:20,cards:[{if:{flag:'zheCopied'},then:'zhe_caught'},{pick:['poster','essay']}]},
   {n:'午餐',t:720,end:750,dest:'cls',lim:22,cards:[{if:{trust:['jiaen',2]},then:'lunch_b',else:'lunch_a'}],need:'spill'},
   {n:'打掃',t:760,end:780,dest:'fld',lim:22,cards:[{if:{trust:['zhe',2]},then:'sweep_a',else:'sweep_b'}]},
-  {n:'下課',t:830,end:840,free:true,route:['dou','lele'],coldRoute:['corner']},
+  {n:'下課',t:830,end:840,free:true,pool:2,coldRoute:['corner']},
   {n:'體育課',t:840,end:880,dest:'fld',lim:22,cards:['relay'],need:'pe'},
   {n:'放學',t:960,end:980,dest:'gate',lim:24,cards:[{if:{flag:'miHelped'},then:'bye_mi',else:'bye_py'}],need:'rain'}
 ],
+
+/* 角色池：下課路上會遇到的事件，每次下課從這裡隨機抽 pool 張（同一天不重複） */
+routePool:['mi','teacher','dou','lele','hao','ting','nana','ken','yan'],
 
 /* ---------- 選擇的種類與溫度規則 ---------- */
 types:{
@@ -423,6 +433,67 @@ C('bye_py','py','校門口','品妍學姊在校門口等家長，家長一直沒
   V('指給她看：「警衛室在那邊。」',['w','她點點頭，深吸一口氣，自己走過去了。',{d:3,tr:1}],['o','她說：「我知道啦，謝謝！」']),
   V('安親班老師在等，先走了',['c','你回頭看，她還站在校門口。'],['o','你回頭看，她已經在警衛室裡講電話了。'])],
   {A:'她一直看著校門外，手緊緊抓著書包帶，說她從來沒進去過警衛室。',B:'她說：「我打個電話給我爸就好，很快，你不用管我啦。」'}),
+C('hao','hao','新髮型','走廊上，六年級的阿豪學長剪了很短的新髮型，一群人圍著他笑：「好像奇異果！」{v}',[
+  V('跟學長聊別的事，把他帶離人群',['w','你問他昨天的球賽，他跟著你走到樓梯口，才鬆了一口氣。'],['o','學長說：「等一下啦，他們還要看！」又轉了一圈。'],{cost:2}),
+  V('跟大家說：「好了啦，不要再笑了。」',['w','大家安靜了一下，慢慢散開。學長對你點點頭。'],['m','學長說：「沒關係啦，是我自己要給他們看的。」大家覺得你很掃興。'],{cost:1}),
+  V('跟著一起笑',['h','學長的笑容越來越小，最後把外套的帽子戴上了。'],['o','大家笑成一團，學長笑得最大聲。']),
+  V('從旁邊走過去',['c','你走過去了。笑聲一直傳到走廊另一頭。'],['o','你走過去了。後面傳來學長的笑聲。'])],
+  {A:'學長一直摸頭，勉強跟著笑，眼睛卻一直看著地上。',B:'學長自己也在笑，還故意轉一圈給大家看：「帥吧！」'}),
+C('ting','ting','貼不到','公佈欄前面，三年級的婷婷拿著一張「失物招領：藍色水壺」的海報。{v}',[
+  V('幫她把海報貼高一點',['w','你們貼好了。她說：「我的水壺是藍色的，上面有恐龍！」'],['o','老師說：「謝謝，我來就好。」你把膠帶遞給老師。',{cost:1}],{cost:1}),
+  V('「貼下面一點就好啦。」',['m','她貼在最下面，被別的海報擋住了一半。'],['o','老師說：「對，貼低一點，小朋友才看得到。」']),
+  V('叫她去找老師幫忙',['c','她跑去辦公室，老師不在。',{by:1}],['o','她說：「老師已經來了！」']),
+  V('「水壺掉了就算了吧。」',['h','她低頭看著海報，眼眶紅了。'],['m','老師看了你一眼：「那是她阿嬤送的。」'])],
+  {A:'她踮著腳一直跳，膠帶黏到頭髮上，還是貼不到。',B:'她旁邊的老師已經拿著膠帶走過來了。'}),
+C('nana','nana','送給老師的卡片','樓梯口，二年級的娜娜手裡拿著一張自己畫的卡片，想送給林老師，可是一直不敢去辦公室。{v}',[
+  V('陪她走到辦公室門口',['w','林老師收到卡片，笑得好開心。娜娜回頭跟你比了一個讚。'],['m','她說：「我在等我朋友啦……」你們兩個站在樓梯口，有點尷尬。',{cost:1}],{cost:3}),
+  V('「你可以的，直接進去就好！」',['m','她點點頭，在辦公室門口站了很久，還是沒進去。'],['o','她說：「對啊！」朋友來了，兩個人一起跑進去。']),
+  V('「我在忙，你找別人陪你。」',['c','她坐在樓梯上，把卡片收回口袋。'],['o','她說：「沒關係，我朋友快來了！」'])],
+  {A:'她小聲問你：「你可以陪我去嗎？」手一直在抖。',B:'她說：「我在等我的好朋友，她說要陪我去！」'}),
+C('ken','ken','差 5 塊','飲水機旁，四年級的小肯攤開手上的零錢，數了好幾遍：「差 5 塊……」{v}',[
+  V('借他 5 塊',['w','他說：「明天一定還你！」第二天，他真的拿了一個 5 塊錢來還。'],['o','他的同學已經借他了。他說：「謝啦，不用了！」'],{cost:1}),
+  V('「你可以買便宜一點的那張啊。」',['w','他想了一下：「也對！」換了一張 10 元的卡片，還是很漂亮。',{d:3}],['o','他說：「好主意！」']),
+  V('裝作沒聽到，喝完水就走',['c','你走了。後面傳來他小聲說：「怎麼辦……」'],['o','你走了。他的同學已經借他了。']),
+  V('「沒錢就不要買啊。」',['h','他把零錢收回口袋，沒有再說話。'],['m','他說：「好啦好啦。」可是旁邊的同學看了你一眼。'])],
+  {A:'他的臉越來越紅，說那是要買給生病請假的同學的卡片。',B:'他笑嘻嘻地說：「誰借我 5 塊？明天還！」旁邊的同學已經在掏錢包了。'}),
+C('yan','yan','鬼抓人','中庭裡，一群四年級的學生在玩鬼抓人。{v}',[
+  V('走過去問她：「要不要跟我們一起玩別的？」',['w','她眼睛亮了一下，跟你們玩了一場跳格子。'],['m','她說：「我真的想看書啦。」又低頭繼續看。'],{cost:2}),
+  V('跟那群人說：「讓她一起玩嘛。」',['w','有人嘟囔了一下，還是讓她加入了。她當鬼，抓到了 3 個人。'],['o','他們說：「她自己說要看書的啦！」'],{cost:1}),
+  V('那是四年級的事，跟我沒關係',['c','鐘響了，小妍一直站在原地。'],['o','鐘響了，小妍把書闔上，回教室了。']),
+  V('跟著說：「對啊，她真的跑很慢。」',['h','小妍轉身走回教室。'],['h','大家笑了起來。小妍聽到了，把書闔上走了。'])],
+  {A:'四年級的小妍站在旁邊看了很久。有人說：「她跑很慢，不要跟她玩。」',B:'四年級的小妍坐在旁邊看書。有人叫她，她揮揮手說：「我今天想看書！」'}),
+/* 鏡像卡：「換個人過同一天」時用。pre 依第一天你在 mirror 那張卡選的類型，換成對方看到的樣子 */
+MC('m_morning','hero','早自習','你是小恩，上星期才從台中轉來五年三班。早自習，你坐在位子上看恐龍圖鑑。{pre}',['jiaen_alone'],{
+  w:'大家圍在一起聊卡通的時候，有一個同學走過來，小聲問你在看什麼。',
+  m:'大家在聊卡通。突然有人大聲喊你的名字，全班都轉過來看你，你的臉一下子就燙了。',
+  o:'大家在聊卡通，沒有人來吵你，你把圖鑑看完了一整章。',
+  c:'大家在聊卡通。有一個同學往你這邊看了一眼，又轉回去了。',
+  h:'大家在聊卡通。你聽到有人小聲說：「他好安靜，好怪喔。」',
+  none:'大家在聊卡通，沒有人往你這邊看。'},[
+  ['鼓起勇氣走過去：「我也有看那部卡通。」','w','有人挪了一個位子給你。你說台中的學校溜滑梯有兩層樓高，大家都轉頭看你。'],
+  ['跟坐隔壁的同學說一聲「早安」就好','w','他回你一句早安。這是你今天第一次跟人說話。',{d:3,tr:1}],
+  ['繼續看書，假裝不在意','c','下課鐘響了。你把書闔上，發現自己一頁都沒看進去。']]),
+MC('m_essay','hero','我的新學校','國語課。你寫的〈我的新學校〉，整篇都在寫台中的舊學校。{pre}',['essay'],{
+  w:'你把作文拿給同學看。他說：「我喜歡你寫的溜滑梯。題目是新學校，要不要也寫一點這裡？」',
+  p:'你把作文拿給同學看。他說：「寫得很好啊！」你很開心地交出去。隔天，老師請你重寫。',
+  c:'你把作文拿給同學看。他說：「我也不太會寫作文，你問老師啦。」',
+  m:'你把作文拿給同學看。他說：「你寫錯題目了耶。」然後就轉回去了。',
+  none:'你寫完作文，想找人看看，可是大家都在忙。'},[
+  ['跟那位同學說：「那這裡有什麼好玩的？我想寫寫看。」','w','他說中庭的升旗台後面有一棵樹，下課可以爬。你把這件事寫進作文。'],
+  ['自己去問老師要怎麼改','o','老師說：「寫寫你這星期遇到的人吧。」你想了很久。'],
+  ['把作文對折收起來，不想再問任何人','c','那篇作文一直壓在課本下面。']]),
+MC('m_lunch','hero','午餐','午餐時間。{pre}',['lunch_a','lunch_b'],{
+  'lunch_a:w':'有人端著餐盤坐到你旁邊，你們比賽誰先把青菜吃完。',
+  'lunch_a:m':'有人大聲叫你過去坐，大家都在看你，你嚇了一跳。',
+  'lunch_a:o':'你戴著耳機看漫畫，沒有人來吵你。',
+  'lunch_a:c':'你一個人坐在最後一排。前面那桌笑得很大聲，沒有人回頭。',
+  'lunch_b:w':'你鼓起勇氣問：「我可以坐這裡嗎？」對方說：「好啊！」還挪了一張椅子給你。',
+  'lunch_b:h':'你鼓起勇氣問：「我可以坐這裡嗎？」對方說：「這邊……好像有人了耶。」其實沒有人。',
+  'lunch_b:c':'你鼓起勇氣問：「我可以坐這裡嗎？」對方低頭吃飯，沒有回答。',
+  none:'你一個人端著餐盤，坐在最後一排。'},[
+  ['主動問旁邊的人：「你們班下課都玩什麼？」','w','他說他們都去中庭玩鬼抓人。「明天一起來啊。」'],
+  ['戴上耳機看漫畫，今天先這樣就好','o','漫畫很好看。你決定明天再試試看。'],
+  ['低頭很快吃完，趴下休息','c','你趴著，聽著大家聊天的聲音。']]),
 /* 下課：路上遇到 */
 C('mi','mi','走廊轉角','你經過走廊轉角。一年級的小米蹲在牆邊，{v}旁邊有兩個一年級的小朋友站著看她。',[
   V('停下來，蹲下問她：「你怎麼了？」',['w','她說上完廁所找不到教室。你牽她走回一年級教室，她的老師正在找她。',{f:'miHelped',trMin:2}],['o','她說：「我在等姊姊！」又繼續滾彈珠。你花 1 分鐘，知道她沒事。',{cost:1}],{cost:3}),
@@ -467,6 +538,30 @@ C('hoop','yx','籃球場','你到了籃球場。六年級的宇翔學長他們�
   {A:'學長他們已經打了一整節下課，每天都這樣。',B:'旁邊牆上貼著體育老師寫的公告：「本週六年級班際比賽練習時間」。'})
 ],
 
+/* ---------- 換個人過同一天 ----------
+   第一天結束後，可以換成這裡列出的角色再過同一天。
+   phaseCards：哪些時段改用別的卡（通常是鏡像卡）；tasks：這個角色自己的事；helpers：需要幫忙時多加的人（hero 是第一天的你） */
+perspectives:{
+  jiaen:{
+    title:'換成小恩，過同一天',
+    intro:'這次你是小恩，上星期才從台中轉來五年三班。同一天、同樣的校園，你會再遇到第一天的你。',
+    shirt:'#cfe5ef',
+    trustFrom:'jiaen',               // 第一天的你在小恩心中的信任，帶到這一天
+    phaseCards:{
+      0:['m_morning','zhe_hw'],
+      2:[{if:{flag:'zheCopied'},then:'zhe_caught'},{if:{prev:'essay'},then:'m_essay',else:'poster'}],
+      3:['m_lunch']},
+    tasks:{
+      data:{n:'把轉學資料交給林老師',s:'轉學資料',due:'第一節下課',at:'off',only:1,go:'去辦公室',act:'交轉學資料',fail:'轉學資料晚交了，林老師中午特地來教室找你。'},
+      health:{n:'去保健室做轉學生健康檢查',s:'健康檢查',due:'第一節下課',at:'nur',only:1,go:'去保健室',act:'做健康檢查',fail:'沒做健康檢查，保健室阿姨來教室找你，全班都看著你走出去。'},
+      dino:{n:'去圖書室借《恐龍圖鑑》第二集',s:'借書',due:'今天放學前',at:'lib',go:'去圖書室',act:'借恐龍圖鑑',fail:'第二集被別人借走了，要等兩個星期。'},
+      note:{n:'去合作社買新的作業簿',s:'作業簿',due:'今天放學前',at:'shop',go:'去合作社',act:'買作業簿',fail:'明天的功課，沒有作業簿可以寫。'},
+      join:{n:'去籃球場，問大家能不能一起玩',s:'一起玩',due:'下午下課',at:'court',only:5,go:'去籃球場',act:'問大家能不能一起玩',fail:'你一直沒走過去。放學時你想：明天再說吧。'}
+    },
+    helpers:['hero']
+  }
+},
+
 /* ---------- 7. 換你需要幫忙 ----------
    helpers：可能來幫你的人（信任最高、且大於 1 的人會來）；沒有人時，校園夠暖（≥60）會有路人幫忙 */
 needs:{
@@ -509,7 +604,9 @@ closing:'明天的校園會是幾度，你覺得由誰決定呢？'
 /* =====================================================================
    遊戲範本：引擎（做新遊戲時不需要修改這個區塊）
    ===================================================================== */
-const PPL=GAME.people,TYPE=GAME.types,TASKS=GAME.tasks,NEEDS=GAME.needs,PHASES=GAME.phases;
+const PPL=GAME.people,TYPE=GAME.types,NEEDS=GAME.needs,PHASES=GAME.phases;
+const PERSP=()=>S&&S.as?GAME.perspectives[S.as]:null;
+const TK=()=>(PERSP()&&PERSP().tasks)||GAME.tasks;
 const CARDS=Object.fromEntries(GAME.cards.map(c=>[c.id,c]));
 const KEY=k=>GAME.id+'_'+k;
 const store={get(k){try{return localStorage.getItem(KEY(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(KEY(k),v)}catch(e){}}};
@@ -606,14 +703,19 @@ const areaById=id=>AREAS.find(a=>a.id===id);
 /* ================= 一天的流程 ================= */
 const FREE_IDX=PHASES.map((p,i)=>p.free?i:-1).filter(i=>i>=0),LAST_FREE=FREE_IDX[FREE_IDX.length-1];
 let S=null;
-function newRun(day,self){
-  S={day:day||1,self:self||(S&&S.self)||'b',t:PHASES[0].t,tm:PHASES[0].t,ph:-1,phT:0,arrived:false,queue:[],dest:null,temp:GAME.startTemp,shown:GAME.startTemp,hist:[],tr:{},flags:{},deeds:{},met:new Set(),
-     log:[],others:[],needs:[],fx:[],over:false,task:Object.fromEntries(Object.keys(TASKS).map(k=>[k,0])),usedArr:{},route:[],leg:null,enc:null,helpMin:0,timeouts:0,by:0,lastDest:null};
+/* 第一天的紀錄整理成「換個人」時要用的資料 */
+function snapshot(){const byId={};S.log.forEach(l=>{byId[l.id]=l});return {byId,log:S.log.slice(),tr:Object.assign({},S.tr),flags:Object.assign({},S.flags)}}
+function newRun(day,self,as,prev){
+  const oldS=S;S=null;
+  S={as:as||null,prev:prev||null,usedRoute:new Set(),day:day||1,self:self||(oldS&&oldS.self)||'b',t:PHASES[0].t,tm:PHASES[0].t,ph:-1,phT:0,arrived:false,queue:[],dest:null,temp:GAME.startTemp,shown:GAME.startTemp,hist:[],tr:{},flags:{},deeds:{},met:new Set(),
+     log:[],others:[],needs:[],fx:[],over:false,mirrors:[],task:null,usedArr:{},route:[],leg:null,enc:null,helpMin:0,timeouts:0,by:0,lastDest:null};
+  S.task=Object.fromEntries(Object.keys(TK()).map(k=>[k,0]));
+  if(S.as&&prev){const p=PERSP();S.tr.hero=prev.tr[p.trustFrom]||0}
 }
 const trust=w=>S.tr[w]||0;
 function addTrust(map,sign){for(const k in map||{})S.tr[k]=trust(k)+map[k]*(sign||1)}
 /* 解讀時段設定裡的卡片寫法 */
-function testCond(c){if(!c)return true;if(c.flag)return !!S.flags[c.flag];if(c.trust)return trust(c.trust[0])>=c.trust[1];return true}
+function testCond(c){if(!c)return true;if(c.flag)return !!S.flags[c.flag];if(c.prev)return !!(S.prev&&S.prev.byId[c.prev]);if(c.trust)return trust(c.trust[0])>=c.trust[1];return true}
 function resolveSpec(sp){
   if(sp==null)return [];
   if(typeof sp==='string')return [sp];
@@ -640,7 +742,7 @@ function initWorld(){
 }
 function startPhase(i){
   S.ph=i;const ph=PHASES[i];AU.bell();S.t=ph.t;S.tm=ph.t;S.phT=0;S.arrived=false;S.enc=null;S.leg=null;S.dest=null;S.lastDest=null;
-  if(ph.free){S.route=(ph.route||[]).concat(S.temp<=GAME.coldLine?(ph.coldRoute||[]):[]);
+  if(ph.free){S.route=drawRoute(ph);
     banner(`${fmt(ph.t)}　${ph.n}`,`${ph.n} ${ph.end-ph.t} 分鐘`);hud();setTimeout(()=>{if(S&&S.ph===i&&!S.over)openMenu(true)},900);return}
   S.dest=Array.isArray(ph.dest)?pick(ph.dest):ph.dest;
   banner(`${fmt(ph.t)}　${ph.n}`,i===0&&GAME.openingLine?`${GAME.openingLine}・走到 ${destName()}`:`走到 ${destName()}`);
@@ -648,10 +750,10 @@ function startPhase(i){
 }
 function freeLeft(){return Math.max(0,Math.ceil(PHASES[S.ph].end-S.tm))}
 function spend(min){if(!PHASES[S.ph].free||!min)return;S.tm=Math.min(PHASES[S.ph].end,S.tm+min);S.t=S.tm;hud()}
-function taskOpen(k,ph){const t=TASKS[k];return S.task[k]===0&&(t.only==null||t.only===ph)}
+function taskOpen(k,ph){const t=TK()[k];return S.task[k]===0&&(t.only==null||t.only===ph)}
 function endFreePhase(){
   const ph=S.ph,failed=[];
-  for(const k in TASKS){const t=TASKS[k];const deadline=t.only!=null?t.only:LAST_FREE;
+  for(const k in TK()){const t=TK()[k];const deadline=t.only!=null?t.only:LAST_FREE;
     if(S.task[k]===0&&deadline===ph){S.task[k]=-1;addTrust(t.failTrust);failed.push(t.s)}}
   if(failed.length)toast(`上課鐘響了。沒做完：${failed.join('、')}`);
   S.enc=null;S.leg=null;NPCS.forEach(n=>n.goto=null);
@@ -661,7 +763,15 @@ function nextPhase(){
   if(S.ph+1>=PHASES.length)return renderEnd();
   startPhase(S.ph+1);
 }
-function arrive(){S.arrived=true;S.queue=resolveSpec(PHASES[S.ph].cards);hud();runQueue()}
+function phaseCards(i){const p=PERSP();return p&&p.phaseCards&&p.phaseCards[i]!==undefined?p.phaseCards[i]:PHASES[i].cards}
+function arrive(){S.arrived=true;S.queue=resolveSpec(phaseCards(S.ph));hud();runQueue()}
+/* 角色池：從 routePool 隨機抽、同一天不重複 */
+function drawRoute(ph){
+  let r=(ph.route||[]).slice();
+  if(ph.pool){const pool=shuffle((GAME.routePool||[]).filter(id=>!S.usedRoute.has(id)));r=r.concat(pool.slice(0,ph.pool))}
+  r.forEach(id=>S.usedRoute.add(id));
+  return r.concat(S.temp<=GAME.coldLine?(ph.coldRoute||[]):[]);
+}
 function runQueue(){
   const ph=PHASES[S.ph];
   if(S.queue.length){const id=S.queue.shift();return openCard(CARDS[id],`${ph.n}・${destName()}`,runQueue)}
@@ -673,12 +783,12 @@ function changeTemp(d){S.temp=clamp(S.temp+d,0,100);hud();AU.setWarm(S.temp/100)
 /* ===== 下課：選目的地、在路上遇到人 ===== */
 function menuOptions(){
   const ph=S.ph,o=[];
-  for(const k in TASKS){if(taskOpen(k,ph)){const t=TASKS[k];if(!o.some(x=>x.d===t.at))o.push({d:t.at,l:t.go||('去'+PLACE[t.at]),s:t.act||t.n})}}
+  for(const k in TK()){if(taskOpen(k,ph)){const t=TK()[k];if(!o.some(x=>x.d===t.at))o.push({d:t.at,l:t.go||('去'+PLACE[t.at]),s:t.act||t.n})}}
   (GAME.breakExtras||[]).forEach(x=>{if(!o.some(y=>y.d===x.d))o.push(x)});
   if(GAME.home)o.push(GAME.home);
   return o.filter(x=>x.d!==S.lastDest).slice(0,6);
 }
-function taskListHTML(){return `<div class="tasks">${Object.entries(TASKS).map(([k,t])=>`<span><b>${S.task[k]===1?'✓':S.task[k]===-1?'✗':'□'}</b>${esc(t.n)}<small style="color:var(--muted)">・${esc(t.due)}</small></span>`).join('')}</div>`}
+function taskListHTML(){return `<div class="tasks">${Object.entries(TK()).map(([k,t])=>`<span><b>${S.task[k]===1?'✓':S.task[k]===-1?'✗':'□'}</b>${esc(t.n)}<small style="color:var(--muted)">・${esc(t.due)}</small></span>`).join('')}</div>`}
 function openMenu(first){
   if(PHASES[S.ph].free&&freeLeft()<=0)return nextPhase();
   const opts=menuOptions();
@@ -695,7 +805,7 @@ function openMenu(first){
 function arriveFree(){
   S.arrived=true;const d=S.dest;S.lastDest=d;S.leg=null;
   const done=[];
-  for(const k in TASKS){const t=TASKS[k];if(t.at===d&&taskOpen(k,S.ph)){S.task[k]=1;spend(t.time||1);addTrust(t.done);done.push(t.s)}}
+  for(const k in TK()){const t=TK()[k];if(t.at===d&&taskOpen(k,S.ph)){S.task[k]=1;spend(t.time||1);addTrust(t.done);done.push(t.s)}}
   if(done.length){AU.ding();toast('✓ '+done.join('、'))}
   if(GAME.home&&d===GAME.home.d){toast(`你${GAME.home.l}，等上課鐘響。`);S.tm=PHASES[S.ph].end;return}
   const arrCard=(GAME.arrivalCards||{})[d];
@@ -755,8 +865,8 @@ function banner(a,b){const el=$('banner');el.innerHTML=`<b>${esc(a)}</b><span>${
 function hud(){
   if(!S||S.ph<0)return;const ph=PHASES[S.ph];
   $('clock').textContent=fmt(S.t);
-  $('phName').textContent=`第 ${S.day} 天・${ph.n}`;
-  const tk=Object.entries(TASKS).map(([k,t])=>`<span class="tk ${S.task[k]===1?'ok':S.task[k]===-1?'no':''}">${esc(t.s)}</span>`).join('');
+  $('phName').textContent=S.as?`同一天・${PPL[S.as].n}・${ph.n}`:`第 ${S.day} 天・${ph.n}`;
+  const tk=Object.entries(TK()).map(([k,t])=>`<span class="tk ${S.task[k]===1?'ok':S.task[k]===-1?'no':''}">${esc(t.s)}</span>`).join('');
   let g;
   if(ph.free)g=`${ph.n}剩 ${freeLeft()} 分鐘${S.dest&&!S.arrived?`・去${PLACE[S.dest]}`:''}`;
   else g=S.arrived?`${ph.n}中`:`目標：走到 ${destName()}`;
@@ -782,7 +892,10 @@ function resolveOp(op,vk){const v=op.v&&op.v[vk]?op.v[vk]:{};return Object.assig
 function openCard(c,place,after,enc){
   const p=PPL[c.who];S.met.add(c.who);
   const vk=c.vars?pick(Object.keys(c.vars)):null;
-  const tx=c.vars?c.tx.replace('{v}',c.vars[vk]):c.tx;
+  let tx=c.vars?c.tx.replace('{v}',c.vars[vk]):c.tx;
+  if(c.mirror){const hit=(S.prev?c.mirror.map(id=>S.prev.byId[id]).filter(Boolean):[])[0];
+    const pre=hit?(c.pre[hit.id+':'+hit.ty]||c.pre[hit.ty]||c.pre.none):c.pre.none;
+    tx=tx.replace('{pre}',pre);S.mirrors.push({ti:c.ti,prev:hit?{ti:hit.ti,l:hit.l,ty:hit.ty}:null,pre})}
   const opts=shuffle(c.ops),free=PHASES[S.ph].free;
   showModal(`<section class="note fade-in"><div class="tape"></div>
     ${CD_SECS>0?'<div class="cd" id="cd"><i id="cdBar"></i></div>':''}
@@ -814,7 +927,7 @@ function choose(c,vk,op,btn,after,enc,timeout){
   if(timeout)S.timeouts++;
   const cost=PHASES[S.ph].free?(x.cost||0):0;
   if(cost){spend(cost);if(x.t==='w'||x.t==='o')S.helpMin+=cost}
-  S.log.push({t:S.t,ti:c.ti,who:c.who,l:x.l,ty:x.t,to:timeout,d,env:env.k});S.hist.push({ti:c.ti,ty:x.t,temp:S.temp});
+  S.log.push({id:c.id,t:S.t,ti:c.ti,who:c.who,l:x.l,ty:x.t,to:timeout,d,env:env.k});S.hist.push({ti:c.ti,ty:x.t,temp:S.temp});
   if(enc){enc.state='done';if(x.t==='w'){enc.heart=3;for(let k=0;k<5;k++)S.fx.push({x:enc.x+(R()-.5),y:enc.y-.4-R()*.5,life:1.3+R()*.6})}}
   let ripple='';
   if(enc&&x.t==='c'&&S.temp>=GAME.warmLine){let best=null,bd=1e9;NPCS.forEach(n=>{const dd=Math.hypot(n.x-enc.x,n.y-enc.y);if(dd<bd){bd=dd;best=n}});if(best){best.goto=enc;S.others.push({who:c.who,ti:c.ti});ripple=`你走過去之後，有一個人停下來陪${PPL[c.who].n}。`}}
@@ -827,12 +940,15 @@ function choose(c,vk,op,btn,after,enc,timeout){
 }
 function openNeed(id,after){
   const N=NEEDS[id];let who=null,best=1;
-  N.helpers.forEach(h=>{if(trust(h)>best){best=trust(h);who=h}});
+  const helpers=((PERSP()&&PERSP().helpers)||[]).concat(N.helpers).filter(h=>h!==S.as);
+  helpers.forEach(h=>{if(trust(h)>best){best=trust(h);who=h}});
   let body,why,d;
-  if(who){const p=PPL[who];body=`${p.r}${p.n}${(N.special&&N.special[who])||N.help}`;why=S.deeds[who]?`今天在〈${S.deeds[who]}〉，你也這樣對待過${p.n}。`:`${p.n}記得你今天對他的好。`;d=2}
+  if(who==='hero'){const pw=S.prev&&S.prev.log.filter(l=>l.who===PERSP().trustFrom&&l.ty==='w').pop();
+    body=`${PPL.hero.n}${N.help}`;why=pw?`第一天，你在〈${pw.ti}〉選了「${pw.l}」。`:'第一天的你，記得對小恩好。';d=2}
+  else if(who){const p=PPL[who];body=`${p.r}${p.n}${(N.special&&N.special[who])||N.help}`;why=S.deeds[who]?`今天在〈${S.deeds[who]}〉，你也這樣對待過${p.n}。`:`${p.n}記得你今天對他的好。`;d=2}
   else if(S.temp>=GAME.needWarm){body=`${N.stranger||'旁邊的人'}${N.help}`;why='今天，大家比較願意伸出手。';d=2}
   else{body=N.none;why='今天，大家好像都在忙自己的事。';d=-2}
-  S.needs.push({ti:N.ti,who,ok:!!(who||S.temp>=GAME.needWarm),body,d});
+  S.needs.push({ti:N.ti,who,hero:who==='hero',ok:!!(who||S.temp>=GAME.needWarm),body,d});
   showModal(`<section class="note fade-in"><div class="tape"></div>
     <div class="note-head"><span class="who" style="color:var(--brick)">換你需要幫忙了</span><span>${fmt(S.t)}</span>${VO.ok?'<button class="speak" id="speakBtn">朗讀</button>':''}</div>
     <h2>${esc(N.ti)}</h2><p class="narr">${esc(N.tx)}</p>
@@ -928,7 +1044,7 @@ function draw(){
       g.save();g.translate(ax,ay);g.rotate(Math.atan2(-r.fy,-r.fx));g.fillStyle='#ffd23f';g.strokeStyle='#1f2a44';g.lineWidth=1.5;g.beginPath();g.moveTo(10,0);g.lineTo(-6,-8);g.lineTo(-6,8);g.closePath();g.fill();g.stroke();g.restore()}}
   const ents=[{k:'p',y:P.y}].concat(NPCS.map(n=>({k:'n',n,y:n.y})),S.enc?[{k:'e',y:S.enc.y}]:[]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
-    if(e.k==='p')return drawPerson(g,P.x*TS,P.y*TS,{moving:P.moving,walk:walkT*2,shirt:'#f6f3ea',pants:'#2c3a66',hair:'#2a211c',tag:'#c8553d',fx:P.fx,fy:P.fy,label:'你',labelBg:'#c8553d'});
+    if(e.k==='p')return drawPerson(g,P.x*TS,P.y*TS,{moving:P.moving,walk:walkT*2,shirt:(PERSP()&&PERSP().shirt)||'#f6f3ea',pants:'#2c3a66',hair:'#2a211c',tag:'#c8553d',fx:P.fx,fy:P.fy,label:'你',labelBg:'#c8553d'});
     if(e.k==='n'){const n=e.n;return drawPerson(g,n.x*TS,n.y*TS,{moving:n.moving,walk:n.walk,shirt:'#f4f4f0',pants:'#2c3a66',hair:'#1b1b1b',bag:n.bag,fx:n.fx||0,fy:n.fy||1,dots:n.bub>0})}
     const s=S.enc,p=PPL[s.who];
     drawPerson(g,s.x*TS,s.y*TS,{moving:0,walk:0,shirt:p.c,pants:'#3b3a44',hair:p.big?'#4a3a30':'#1b1b1b',small:p.small,big:p.big,fx:0,fy:1,label:p.n,labelBg:p.c});
@@ -976,7 +1092,6 @@ function renderStart(){
       <span><b>100°</b></span>${GAME.tiers.map(t=>`<span><b>${t.min}°</b>${esc(t.n.replace(/的.*$/,''))}</span>`).join('')}</div><div class="bulb"></div></div>
   </section>
   <div class="how">${GAME.how.map(([b,t])=>`<div><b>${esc(b)}</b>${esc(CD_SECS>0?t.replace('{cd}',CD_SECS):(t.includes('{cd}')?'這一輪沒有倒數，可以慢慢想。':t))}</div>`).join('')}</div>
-  <div class="cast"><h3>今天會遇到的人</h3><div class="people">${GAME.cast.map(k=>`<span><i style="background:${PPL[k].c}"></i>${esc(PPL[k].r)}・${esc(PPL[k].n)}</span>`).join('')}</div></div>
   <div class="selfq"><h3>開始前，先想一想</h3>
     <p>${esc(GAME.selfCheck.q)}</p>
     <div class="opts">${Object.entries(GAME.selfCheck.options).map(([k,v],i)=>`<button class="opt" data-k="${k}"><span class="k">${'ABCDE'[i]}</span><span class="t">${esc(v)}</span></button>`).join('')}</div>
@@ -987,6 +1102,19 @@ function renderStart(){
   </footer>`;
   const sel=$('cdSel');sel.value=String(CD_SECS);sel.onchange=()=>{CD_SECS=+sel.value;store.set('cd',String(CD_SECS));renderStart();const f=$('cdSel');if(f)f.focus()};
   document.querySelectorAll('.selfq .opt').forEach(b=>b.onclick=()=>{newRun(1,b.dataset.k);startGame()});
+  scrollTo(0,0);
+}
+function renderIntro(as,prev){
+  const p=GAME.perspectives[as];running=false;AU.bgmStop();VO.stop();$('game').hidden=true;$('end').hidden=true;$('start').hidden=false;
+  $('start').innerHTML=`<section class="hero"><div style="min-width:0">
+      <div class="eyebrow">換個人，過同一天</div>
+      <h1 class="title">${esc(PPL[as].n)}的<span>一天</span></h1>
+      <p class="ask">${esc(p.intro)}</p>
+      <p class="lede">今天，${esc(PPL[as].n)}也有 ${Object.keys(p.tasks).length} 件自己的事要做。你第一天做過的選擇，會變成${esc(PPL[as].n)}遇到的事。</p></div></section>
+    <div class="how"><div><b>自己的事</b>${Object.values(p.tasks).map(t=>esc(t.s)).join('、')}</div><div><b>第一天的你</b>會出現在${esc(PPL[as].n)}的一天裡。</div></div>
+    <button class="primary" id="goAs" style="margin-top:22px;width:100%;max-width:340px;padding:14px;border:none;border-radius:999px;font-family:var(--f-display);font-size:19px">${fmt(PHASES[0].t)} 走進校門</button>
+    <footer class="foot">${GAME.credit?`<p class="credit">${esc(GAME.credit)}</p>`:''}</footer>`;
+  $('goAs').onclick=()=>{newRun(1,null,as,prev);startGame()};
   scrollTo(0,0);
 }
 function startGame(){
@@ -1021,17 +1149,19 @@ function renderEnd(){
   if(cnt.m)notes.push(`有 ${cnt.m} 次你想幫忙，但沒先看清楚對方需要什麼。`);
   const selfTxt=GAME.selfCheck.options[S.self];
   o.innerHTML=`<div class="wrap">
-    <div class="eyebrow">第 ${S.day} 天・${esc(GAME.endEyebrow||'')}</div>
+    <div class="eyebrow">${S.as?esc(PPL[S.as].n)+'的一天':'第 '+S.day+' 天'}・${esc(GAME.endEyebrow||'')}</div>
     <div class="deg"><b>${S.temp}°</b><span class="ending">${esc(tier.n)}</span></div>
     <p class="tierline">${esc(tier.d)}</p>
     <div class="sect"><h3>今天的溫度變化</h3>
       <p class="vsnote">一開始是 ${GAME.startTemp}°。你每做一個選擇，溫度都在悄悄改變，最後是 ${S.temp}°。圖上每一個點是一張紙條，點的顏色是那次選擇的種類。</p>
       ${tempChart()}</div>
+    ${S.as&&S.mirrors.length?`<div class="sect"><h3>從${esc(PPL[S.as].n)}那邊看</h3><ul class="plain">${S.mirrors.map(m=>`<li><b>${esc(m.ti)}</b>　第一天，你選了${m.prev?`「${esc(m.prev.l)}」`:'——沒有遇到這件事'}。<br>${esc(PPL[S.as].n)}看到的是：${esc(m.pre)}</li>`).join('')}</ul>
+      <p class="vsnote">${S.needs.some(n=>n.hero)?`${esc(PPL[S.as].n)}需要幫忙時，第一天的你來了。`:`${esc(PPL[S.as].n)}需要幫忙時，第一天的你沒有出現。`}</p></div>`:''}
     <div class="sect"><h3>你說的，和你做的</h3>
       <div class="vs"><div><small>開始前，你說你通常會</small><b>${esc(selfTxt)}</b></div><div><small>今天，你實際上</small><b>${actual}</b></div></div>
       <p class="vsnote">${notes.map(esc).join('<br>')}</p></div>
     <div class="sect"><h3>你自己的事</h3>
-      <ul class="log">${Object.entries(TASKS).map(([k,t])=>`<li><time></time><span class="c"><b>${esc(t.n)}</b>${S.task[k]===1?'':`<br><span style="color:var(--muted)">${esc(t.fail)}</span>`}</span><span class="chip ${S.task[k]===1?'n':'c'}">${S.task[k]===1?'做完了':'沒做完'}</span></li>`).join('')}</ul>
+      <ul class="log">${Object.entries(TK()).map(([k,t])=>`<li><time></time><span class="c"><b>${esc(t.n)}</b>${S.task[k]===1?'':`<br><span style="color:var(--muted)">${esc(t.fail)}</span>`}</span><span class="chip ${S.task[k]===1?'n':'c'}">${S.task[k]===1?'做完了':'沒做完'}</span></li>`).join('')}</ul>
       <p class="vsnote">今天，你花了 ${S.helpMin} 分鐘在別人身上。</p></div>
     <div class="sect"><h3>今天的每一張紙條</h3>
       <ul class="log">${S.log.map(l=>`<li><time>${fmt(l.t)}</time><span class="c"><b>${esc(l.ti)}</b>：${esc(l.l)}${l.to?'<em>時間到</em>':''}${l.env?`<em style="color:var(--muted)">（${esc(GAME.envText[l.env].lab)}）</em>`:''}</span><span class="chip ${l.ty}">${TYPE[l.ty].n} ${dlab(l.d)}</span></li>`).join('')}</ul></div>
@@ -1045,10 +1175,12 @@ function renderEnd(){
       ${(GAME.endNotes||[]).map((n,i)=>`<div class="bystander"${i===0?' style="border-left-color:var(--brick)"':''}><b>${esc(n.title)}</b><br>${esc(n.text)}</div>`).join('')}</div>
     <div class="sect"><h3>想一想</h3><details><summary>課後討論題（${GAME.questions.length} 題）</summary><ol>${GAME.questions.map(q=>`<li>${esc(q.replace('{self}',selfTxt))}</li>`).join('')}</ol></details></div>
     ${GAME.closing?`<p class="tierline">${esc(GAME.closing)}</p>`:''}
-    <div class="row"><button class="primary" id="again">再過一天</button><button class="ghost" id="home">回到開始</button></div>
+    <div class="row">${!S.as?Object.entries(GAME.perspectives||{}).map(([k,p])=>`<button class="primary" data-as="${k}">${esc(p.title)}</button>`).join(''):''}<button class="${S.as?'primary':'ghost'}" id="again">${S.as?'用自己再過一天':'再過一天'}</button><button class="ghost" id="home">回到開始</button></div>
     ${GAME.credit?`<p class="credit" style="color:var(--muted);margin-top:22px">${esc(GAME.credit)}</p>`:''}
   </div>`;
-  $('again').onclick=()=>{newRun(S.day+1,S.self);startGame()};
+  const snap=snapshot();
+  o.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>renderIntro(b.dataset.as,snap));
+  $('again').onclick=()=>{newRun(S.as?1:S.day+1,S.self);startGame()};
   $('home').onclick=()=>renderStart();
   o.scrollTop=0;
 }
